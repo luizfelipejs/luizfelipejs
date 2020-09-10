@@ -6,7 +6,7 @@
 
 ## tecnologias que sei atualmente 🖥️
 
-<ul list-style="none">
+<ul>
   <li>SQL</li>
   <li>MongoDB</li>
   <li>Node JS</li>
@@ -18,7 +18,7 @@
 
 ### Frameworks que uso ⚙️
 
-<ul list-style="none">
+<ul>
   <li>React</li>
   <li>Knex</li>
 </ul>
@@ -26,8 +26,8 @@
 
 ## Ferramentas que gosto de usar 🧰
 
-<ul list-style="none">
-  <li>Prettier</li
+<ul>
+  <li>Prettier</li>
   <li>TabNine</li>
   <li>EsLint</li>
 </ul>
