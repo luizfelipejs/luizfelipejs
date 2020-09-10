@@ -1,16 +1,33 @@
-### Hi there 👋
+# Um pouco sobre mim 
 
-<!--
-**luizfelipejs/luizfelipejs** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
+<p>
+  Meu nome e luiz felipe faz dois anos que decidi entrar pra esse universo da programação e quero me tornar cada vez melhor e entrar pro mercado de trabalho
+<p/>
 
-Here are some ideas to get you started:
+## tecnologias que sei atualmente 🖥️
 
-- 🔭 I’m currently working on ...
-- 🌱 I’m currently learning ...
-- 👯 I’m looking to collaborate on ...
-- 🤔 I’m looking for help with ...
-- 💬 Ask me about ...
-- 📫 How to reach me: ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
--->
+<ul list-style="none">
+  <li>SQL</li>
+  <li>MongoDB</li>
+  <li>Node JS</li>
+  <li>Html</li>
+  <li>Css</li>
+  <li>Javascript</li>
+  <li>SocketIO</li>
+</ul>
+
+### Frameworks que uso ⚙️
+
+<ul list-style="none">
+  <li>React</li>
+  <li>Knex</li>
+</ul>
+
+
+## Ferramentas que gosto de usar 🧰
+
+<ul list-style="none">
+  <li>Prettier</li
+  <li>TabNine</li>
+  <li>EsLint</li>
+</ul>
