@@ -1,4 +1,4 @@
-## tecnologias que sei 🖥️
+## Tecnologias que sei 🖥️
 * javascript
 * typescript
 * Ruby 
@@ -6,11 +6,11 @@
 * Html5
 * Css
 * Node Js
-## Frameworks que uso ⚙️
+### Frameworks que uso ⚙️
 * React
 * React Native
 * TypeORM
-## Ferramentas que gosto de usar 🧰
+#### Ferramentas que gosto de usar 🧰
 * Eslint
 * Prettier
 * Tabnine
