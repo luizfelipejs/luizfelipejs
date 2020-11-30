@@ -1,5 +1,3 @@
-<img src="https://github.com/pr2tik1/pr2tik1/blob/master/IMAGE-NAME">
-
 ### Ola 👋
 
 Meu nome é luiz atualmente sou programador por aqui você vai encontrar meus projetos pessoais. 
