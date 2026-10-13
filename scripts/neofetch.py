@@ -27,10 +27,10 @@ THEMES = {
     "light": dict(bg="#f6f8fa", text="#24292f", key="#953800", value="#0a3069", dots="#c2cfde", prompt="#116329"),
 }
 
-# art: colunas do desenho (0 = desenho em cima do texto); cols: largura do texto em caracteres
+# art: colunas do desenho (0 = desenho em cima do texto); columns: larguras das colunas de texto
 LAYOUTS = {
-    "desktop": dict(size=11, lead=15, pad=16, art=34, gap=5, cols=82, short=False),
-    "mobile": dict(size=11, lead=15, pad=12, art=0, gap=0, cols=44, short=True, art_mobile=24),
+    "desktop": dict(size=11, lead=15, pad=16, art=18, gap=4, columns=(46, 46), col_gap=5),
+    "mobile": dict(size=11, lead=15, pad=12, art=0, gap=0, columns=(44,), col_gap=0, art_mobile=24),
 }
 
 # tempos da animação, em segundos
@@ -109,20 +109,41 @@ def section(title, width):
     return [("- ", "dots"), (title, "text"), (" " + "─" * (width - len(title) - 3), "dots")]
 
 
-def lines(solved, width, short):
-    s = lambda full, brief: brief if short else full
+def columns(solved, widths):
+    """As informações, em uma coluna (celular) ou duas (desktop, para o cartão ficar baixo)."""
+    header = [("luiz", "value"), ("@", "text"), ("felipe", "value")]
+    if len(widths) == 1:
+        (w,) = widths
+        return [[
+            header + [(" " + "─" * (w - 12), "dots")],
+            kv("Curso", "Ciência da Computação · UFPel", w),
+            kv("Pesquisa", "IC em modelagem, EDPs", w),
+            kv("Linguagens", "C, C++, Python, LaTeX", w),
+            kv("Matemática", "análise real, medida", w),
+            kv("Interesses", "arquitetura, concorrência", w),
+            section("Projetos", w),
+            kv("atlas-pdf", "PDFs por conteúdo", w),
+            kv("modelagem", "caos e ajuste de modelos", w),
+            section("Codeforces", w),
+            kv(CODEFORCES_USER, f"{solved} problemas resolvidos", w),
+        ]]
+    left, right = widths
     return [
-        [("luiz", "value"), ("@", "text"), ("felipe", "value"), (" " + "─" * (width - 12), "dots")],
-        kv("Curso", s("Ciência da Computação · Universidade Federal de Pelotas", "Ciência da Computação · UFPel"), width),
-        kv("Pesquisa", s("IC em modelagem matemática: controle populacional e EDPs", "IC em modelagem, EDPs"), width),
-        kv("Linguagens", "C, C++, Python, LaTeX", width),
-        kv("Matemática", s("análise real, espaços métricos, integração de Lebesgue", "análise real, medida"), width),
-        kv("Interesses", s("arquitetura de computadores, memória, concorrência", "arquitetura, concorrência"), width),
-        section("Projetos", width),
-        kv("atlas-pdf", s("biblioteca de PDFs por conteúdo · Python, Electron, SQLite", "PDFs por conteúdo"), width),
-        kv("modelagem", s("mapa logístico e caos, farmacocinética, ajuste de modelos", "caos e ajuste de modelos"), width),
-        section("Codeforces", width),
-        kv(CODEFORCES_USER, f"{solved} problemas resolvidos", width),
+        [
+            header + [(" " + "─" * (left - 12), "dots")],
+            kv("Curso", "Ciência da Computação · UFPel", left),
+            kv("Pesquisa", "IC: controle populacional, EDPs", left),
+            kv("Linguagens", "C, C++, Python, LaTeX", left),
+            kv("Matemática", "análise real, espaços métricos", left),
+            kv("Interesses", "arquitetura de computadores", left),
+        ],
+        [
+            section("Projetos", right),
+            kv("atlas-pdf", "PDFs por conteúdo · Electron", right),
+            kv("modelagem", "caos, farmacocinética, ajustes", right),
+            section("Codeforces", right),
+            kv(CODEFORCES_USER, f"{solved} problemas resolvidos", right),
+        ],
     ]
 
 
@@ -137,9 +158,10 @@ def render(solved, theme, kind):
     c, L, ty = THEMES[theme], LAYOUTS[kind], Type()
     size, lead, pad = L["size"], L["lead"], L["pad"]
     cw = size * 0.6  # a JetBrains Mono tem avanço de 600/1000 em todos os glifos
-    bar = 28
-    W = math.ceil(pad * 2 + (L["art"] + L["gap"] + L["cols"]) * cw)
-    top = bar + pad * 0.6
+    bar = 24
+    text_cols = sum(L["columns"]) + L["col_gap"] * (len(L["columns"]) - 1)
+    W = math.ceil(pad * 2 + (L["art"] + L["gap"] + text_cols) * cw)
+    top = bar + 6
 
     def x_of(col):
         return pad + col * cw
@@ -154,21 +176,20 @@ def render(solved, theme, kind):
             col += len(text)
         return "".join(out)
 
-    info = lines(solved, L["cols"], L["short"])
+    info = columns(solved, L["columns"])
     art_cols = L["art"] or L["art_mobile"]
-    art_col = 0 if L["art"] else (L["cols"] - art_cols) / 2
-    first = 2  # linha 0: prompt com o comando; linha 1: em branco
+    art_col = 0 if L["art"] else (text_cols - art_cols) / 2
+    first = 1  # linha 0: prompt com o comando
     art, art_rows, origin = braille(x_of(art_col), top + first * lead, art_cols, cw, lead)
-    caption_row = first + art_rows
+    tallest = max(len(col) for col in info)
     if L["art"]:
-        info_row = first + max(0, (art_rows + 1 - len(info)) // 2)
-        info_col = L["art"] + L["gap"]
-        last = max(caption_row, info_row + len(info) - 1)
+        info_row = first + max(0, (art_rows - tallest) // 2)
+        last = max(first + art_rows, info_row + tallest) - 1
     else:
-        info_row, info_col = caption_row + 2, 0
-        last = info_row + len(info) - 1
-    final_row = last + 2
-    H = math.ceil(y_of(final_row) + lead * 0.28 + pad)
+        info_row = first + art_rows + 1
+        last = info_row + tallest - 1
+    final_row = last + 1
+    H = math.ceil(y_of(final_row) + lead * 0.28 + pad * 0.7)
 
     # 1) prompt e o comando digitado letra a letra
     out = [write(0, 0, [(PROMPT, "prompt")])]
@@ -181,14 +202,14 @@ def render(solved, theme, kind):
     delay = lambda row: start + (row - first) * LINE_STEP
     for r in range(art_rows):
         if r in art:
-            out.append(at(delay(first + r), f'<path d="{art[r]}" stroke="{c["text"]}" stroke-width="1.5" stroke-linecap="round"/>'))
+            out.append(at(delay(first + r), f'<path d="{art[r]}" stroke="{c["text"]}" stroke-width="1.4" stroke-linecap="round"/>'))
     out.append(at(delay(first + art_rows // 2),
-                  f'<circle cx="{origin[0]:.1f}" cy="{origin[1]:.1f}" r="2.8" fill="none" stroke="{c["key"]}" stroke-width="1.1"/>'))
-    caption = "ζ(½ + it), 0 ≤ t ≤ 50"
-    out.append(at(delay(caption_row), ty.text(x_of(art_col + art_cols / 2), y_of(caption_row), caption, "mono",
-                                              size * 0.9, c["dots"], anchor="middle")))
-    for k, segments in enumerate(info):
-        out.append(at(delay(info_row + k), write(info_col, info_row + k, segments)))
+                  f'<circle cx="{origin[0]:.1f}" cy="{origin[1]:.1f}" r="2.5" fill="none" stroke="{c["key"]}" stroke-width="1"/>'))
+    col = L["art"] + L["gap"]
+    for width, rows in zip(L["columns"], info):
+        for k, segments in enumerate(rows):
+            out.append(at(delay(info_row + k), write(col, info_row + k, segments)))
+        col += width + L["col_gap"]
 
     # 3) prompt novo, com o cursor piscando
     end = delay(last) + 0.25
@@ -209,18 +230,20 @@ def render(solved, theme, kind):
            f"{(typed + 0.01) / span * 100:.1f}%,100%{{transform:translateX({len(COMMAND) * cw:.1f}px);opacity:0}}}}"
            "@media (prefers-reduced-motion:reduce){.p,.blink{animation:none}.typing{display:none}}")
 
-    dots_bar = "".join(f'<circle cx="{pad + 6 + i * 16}" cy="{bar / 2 + 1}" r="4.5" fill="{c["dots"]}"/>' for i in range(3))
-    title = ty.text(W / 2, bar / 2 + 4.5, "luiz@felipe: ~", "mono", size * 0.9, c["dots"], anchor="middle")
+    dots_bar = "".join(f'<circle cx="{pad + 4 + i * 14}" cy="{bar / 2 + 1}" r="4" fill="{c["dots"]}"/>' for i in range(3))
+    bar_text = (ty.text(W / 2, bar / 2 + 4.5, "luiz@felipe: ~", "mono", size * 0.9, c["dots"], anchor="middle")
+                + (ty.text(W - pad, bar / 2 + 4.5, "ζ(½ + it), 0 ≤ t ≤ 50", "mono", size * 0.9, c["dots"], anchor="end")
+                   if L["art"] else ""))
     desc = (f"Terminal em que o comando neofetch é digitado e a saída aparece linha a linha. À esquerda, a curva da "
-            f"função zeta de Riemann ζ(½ + it) em pontos braille. À direita: Ciência da Computação na UFPel; "
-            f"iniciação científica em modelagem matemática (controle populacional e EDPs); C, C++, Python e LaTeX; "
-            f"análise real; projetos atlas-pdf e modelagem; {solved} problemas resolvidos no Codeforces como "
+            f"função zeta de Riemann ζ(½ + it), para 0 ≤ t ≤ 50, em pontos braille. Ao lado: Ciência da Computação "
+            f"na UFPel; iniciação científica em modelagem matemática (controle populacional e EDPs); C, C++, Python e "
+            f"LaTeX; análise real; projetos atlas-pdf e modelagem; {solved} problemas resolvidos no Codeforces como "
             f"{CODEFORCES_USER}.")
     return (f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" '
             f'role="img" aria-labelledby="t d">\n<title id="t">luiz@felipe</title>\n<desc id="d">{desc}</desc>\n'
             f"<style>{css}</style>\n<defs>{ty.defs()}</defs>\n"
             f'<rect width="{W}" height="{H}" rx="12" fill="{c["bg"]}"/>\n'
-            f'{dots_bar}{title}<rect x="0" y="{bar + 4}" width="{W}" height="1" fill="{c["dots"]}" opacity=".35"/>\n'
+            f'{dots_bar}{bar_text}<rect x="0" y="{bar + 2}" width="{W}" height="1" fill="{c["dots"]}" opacity=".35"/>\n'
             f'{"".join(out)}\n</svg>\n')
 
 
