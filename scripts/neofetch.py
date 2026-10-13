@@ -2,9 +2,8 @@
 """Gera o cartão do perfil, um terminal rodando neofetch: assets/neofetch[-mobile]-{light,dark}.svg.
 
 Ao abrir a página, o comando `neofetch` é digitado no prompt e a saída é impressa
-linha a linha: à esquerda, no lugar do logo da distro, a curva ζ(½ + it) numa
-malha de pontos braille; à direita, formação, pesquisa, projetos e o número de
-problemas resolvidos no Codeforces, puxado da API pública. Roda todo dia pelo workflow.
+linha a linha: formação, pesquisa, projetos e o número de problemas resolvidos no
+Codeforces, puxado da API pública. Roda todo dia pelo workflow.
 
 Uso: python3 scripts/neofetch.py
 Se a API falhar, sai com erro e não mexe nos arquivos existentes.
@@ -27,15 +26,14 @@ THEMES = {
     "light": dict(bg="#f6f8fa", text="#24292f", key="#953800", value="#0a3069", dots="#c2cfde", prompt="#116329"),
 }
 
-# desktop: desenho numa faixa à esquerda com a altura toda e o terminal ao lado, para o cartão ficar baixo;
-# celular: desenho em cima do texto. columns: larguras das colunas de informação, em caracteres.
+# columns: larguras das colunas de informação, em caracteres; no desktop ficam lado a lado, para o cartão ser baixo
 LAYOUTS = {
-    "desktop": dict(size=11, lead=15, pad=14, art=18, gap=4, columns=(46, 46), col_gap=6),
-    "mobile": dict(size=11, lead=15, pad=12, art=0, gap=0, columns=(44,), col_gap=0, art_mobile=24),
+    "desktop": dict(size=11, lead=15, pad=14, columns=(56, 56), col_gap=8),
+    "mobile": dict(size=11, lead=15, pad=12, columns=(44,), col_gap=0),
 }
 
 # tempos da animação, em segundos
-TYPE_START, TYPE_STEP, PRINT_GAP, LINE_STEP = 0.7, 0.09, 0.35, 0.055
+TYPE_START, TYPE_STEP, PRINT_GAP, LINE_STEP = 0.7, 0.09, 0.35, 0.07
 
 
 # ---- dados -----------------------------------------------------------------
@@ -63,41 +61,6 @@ def solved_count():
                 for s in submissions if s.get("verdict") == "OK"})
 
 
-# ---- a curva -----------------------------------------------------------------
-
-BERNOULLI = (1 / 6, -1 / 30, 1 / 42, -1 / 30, 5 / 66, -691 / 2730, 7 / 6)  # B₂ … B₁₄
-
-
-def zeta(s, n=30):
-    """ζ(s) por Euler–Maclaurin: soma direta até n − 1 e correção pela cauda."""
-    total = sum(k ** -s for k in range(1, n)) + n ** (1 - s) / (s - 1) + 0.5 * n ** -s
-    term, fact = s * n ** (-s - 1), 2
-    for j, b in enumerate(BERNOULLI, 1):
-        total += b / fact * term
-        term *= (s + 2 * j - 1) * (s + 2 * j) / n ** 2
-        fact *= (2 * j + 1) * (2 * j + 2)
-    return total
-
-
-CURVE = [zeta(complex(0.5, 50 * i / 12000)) for i in range(12001)]  # 0 ≤ t ≤ 50
-
-
-def braille(x0, y0, cols, cw, lead):
-    """Rasteriza a curva numa malha de 2 × 4 pontos por caractere, como um terminal com braille.
-
-    Devolve um caminho por linha de texto (para imprimir linha a linha), o número
-    de linhas ocupadas e a posição da origem.
-    """
-    dx, dy = cw / 2, lead / 4
-    re0, re1, im1 = -1.55, 3.75, 2.25
-    scale = cols * cw / (re1 - re0)
-    dots = {(math.floor((z.real - re0) * scale / dx), math.floor((im1 - z.imag) * scale / dy)) for z in CURVE}
-    rows = {}
-    for i, j in sorted(dots, key=lambda d: (d[1], d[0])):
-        rows.setdefault(j // 4, []).append(f"M{x0 + (i + .5) * dx:.1f},{y0 + (j + .5) * dy:.1f}h0")
-    return {r: "".join(p) for r, p in rows.items()}, max(rows) + 1, (x0 - re0 * scale, y0 + im1 * scale)
-
-
 # ---- texto ---------------------------------------------------------------------
 
 def kv(key, value, width):
@@ -111,7 +74,7 @@ def section(title, width):
 
 
 def columns(solved, widths):
-    """As informações, em uma coluna (celular) ou duas lado a lado (desktop, para o cartão ficar baixo)."""
+    """As informações, em uma coluna (celular) ou duas lado a lado (desktop)."""
     header = [("luiz", "value"), ("@", "text"), ("felipe", "value")]
     if len(widths) == 1:
         (w,) = widths
@@ -132,14 +95,14 @@ def columns(solved, widths):
         [
             header + [(" " + "─" * (left - 12), "dots")],
             kv("Curso", "Ciência da Computação · UFPel", left),
-            kv("Pesquisa", "IC: controle populacional, EDPs", left),
+            kv("Pesquisa", "IC: controle populacional e EDPs", left),
             kv("Linguagens", "C, C++, Python, LaTeX", left),
-            kv("Matemática", "análise real, espaços métricos", left),
+            kv("Matemática", "análise real, espaços métricos, Lebesgue", left),
         ],
         [
             section("Projetos", right),
-            kv("atlas-pdf", "PDFs por conteúdo · Electron", right),
-            kv("modelagem", "caos, farmacocinética, ajustes", right),
+            kv("atlas-pdf", "biblioteca de PDFs por conteúdo · Electron", right),
+            kv("modelagem", "mapa logístico, farmacocinética, ajustes", right),
             section("Codeforces", right),
             kv(CODEFORCES_USER, f"{solved} problemas resolvidos", right),
         ],
@@ -157,10 +120,8 @@ def render(solved, theme, kind):
     c, L, ty = THEMES[theme], LAYOUTS[kind], Type()
     size, lead, pad = L["size"], L["lead"], L["pad"]
     cw = size * 0.6  # a JetBrains Mono tem avanço de 600/1000 em todos os glifos
-    side = bool(L["art"])  # desktop: desenho numa faixa lateral
-    info_cols = sum(L["columns"]) + L["col_gap"] * (len(L["columns"]) - 1)
-    term = L["art"] + L["gap"] if side else 0  # coluna onde começa o terminal
-    W = math.ceil(pad * 2 + (term + info_cols) * cw)
+    width = sum(L["columns"]) + L["col_gap"] * (len(L["columns"]) - 1)
+    W = math.ceil(pad * 2 + width * cw)
     top = pad * 0.55
 
     def x_of(col):
@@ -177,54 +138,30 @@ def render(solved, theme, kind):
         return "".join(out)
 
     info = columns(solved, L["columns"])
-    tallest = max(len(col) for col in info)
-    art_cols = L["art"] or L["art_mobile"]
-    if side:
-        info_row, art_row, art_col = 1, 0, 0
-        art, art_rows, origin = braille(x_of(0), top, art_cols, cw, lead)
-        final_row = max(info_row + tallest, art_rows - 1)
-    else:
-        art_row, art_col = 1, (info_cols - art_cols) / 2
-        art, art_rows, origin = braille(x_of(art_col), top + lead, art_cols, cw, lead)
-        info_row = 1 + art_rows + 1
-        final_row = info_row + tallest
+    final_row = 1 + max(len(col) for col in info)
     H = math.ceil(y_of(final_row) + lead * 0.28 + pad * 0.55)
 
     # 1) prompt e o comando digitado letra a letra
-    prompt_col = term
-    out = [write(prompt_col, 0, [(PROMPT, "prompt")])]
+    out = [write(0, 0, [(PROMPT, "prompt")])]
     for k, ch in enumerate(COMMAND):
-        out.append(at(TYPE_START + k * TYPE_STEP, write(prompt_col + len(PROMPT) + k, 0, [(ch, "text")])))
+        out.append(at(TYPE_START + k * TYPE_STEP, write(len(PROMPT) + k, 0, [(ch, "text")])))
     typed = TYPE_START + len(COMMAND) * TYPE_STEP
     start = typed + PRINT_GAP
 
-    # 2) a saída, linha a linha; no desktop o desenho se imprime junto, de cima para baixo
-    delay = lambda row: start + (row - 1) * LINE_STEP
-    for r in range(art_rows):
-        if r in art:
-            out.append(at(delay(art_row + r) if not side else start + r * LINE_STEP,
-                          f'<path d="{art[r]}" stroke="{c["text"]}" stroke-width="1.4" stroke-linecap="round"/>'))
-    out.append(at(start + art_rows // 2 * LINE_STEP,
-                  f'<circle cx="{origin[0]:.1f}" cy="{origin[1]:.1f}" r="2.5" fill="none" stroke="{c["key"]}" stroke-width="1"/>'))
-    col = term
-    for width, rows in zip(L["columns"], info):
+    # 2) a saída, linha a linha
+    col = 0
+    for col_width, rows in zip(L["columns"], info):
         for k, segments in enumerate(rows):
-            out.append(at(delay(info_row + k), write(col, info_row + k, segments)))
-        col += width + L["col_gap"]
+            out.append(at(start + k * LINE_STEP, write(col, 1 + k, segments)))
+        col += col_width + L["col_gap"]
 
-    # 3) prompt novo, com o cursor piscando, e a legenda da curva no canto
-    end = max(delay(final_row - 1), start + art_rows * LINE_STEP) + 0.25
-    cursor = (f'<rect class="blink" x="{x_of(prompt_col + len(PROMPT)):.1f}" y="{y_of(final_row) - size * 0.8:.1f}" '
+    # 3) prompt novo, com o cursor piscando
+    end = start + (final_row - 1) * LINE_STEP + 0.25
+    cursor = (f'<rect class="blink" x="{x_of(len(PROMPT)):.1f}" y="{y_of(final_row) - size * 0.8:.1f}" '
               f'width="{cw:.1f}" height="{size:.1f}" fill="{c["text"]}" style="animation-delay:{end:.2f}s"/>')
-    caption = "ζ(½ + it), 0 ≤ t ≤ 50"
-    caption_svg = (ty.text(x_of(term + info_cols), y_of(final_row), caption, "mono", size * 0.9, c["dots"], anchor="end")
-                   if side else ty.text(x_of(art_col + art_cols / 2), y_of(art_row + art_rows), caption, "mono",
-                                        size * 0.9, c["dots"], anchor="middle"))
-    out.append(at(end, write(prompt_col, final_row, [(PROMPT, "prompt")]) + cursor + (caption_svg if side else "")))
-    if not side:
-        out.append(at(delay(art_row + art_rows), caption_svg))
+    out.append(at(end, write(0, final_row, [(PROMPT, "prompt")]) + cursor))
     # cursor do primeiro prompt: anda enquanto o comando é digitado e some no Enter
-    out.append(f'<rect class="typing" x="{x_of(prompt_col + len(PROMPT)):.1f}" y="{y_of(0) - size * 0.8:.1f}" '
+    out.append(f'<rect class="typing" x="{x_of(len(PROMPT)):.1f}" y="{y_of(0) - size * 0.8:.1f}" '
                f'width="{cw:.1f}" height="{size:.1f}" fill="{c["text"]}"/>')
 
     span = start
@@ -237,8 +174,7 @@ def render(solved, theme, kind):
            f"{(typed + 0.01) / span * 100:.1f}%,100%{{transform:translateX({len(COMMAND) * cw:.1f}px);opacity:0}}}}"
            "@media (prefers-reduced-motion:reduce){.p,.blink{animation:none}.typing{display:none}}")
 
-    desc = (f"Terminal em que o comando neofetch é digitado e a saída aparece linha a linha. Ao lado, a curva da "
-            f"função zeta de Riemann ζ(½ + it), para 0 ≤ t ≤ 50, em pontos braille. Na saída: Ciência da Computação "
+    desc = (f"Terminal em que o comando neofetch é digitado e a saída aparece linha a linha: Ciência da Computação "
             f"na UFPel; iniciação científica em modelagem matemática (controle populacional e EDPs); C, C++, Python e "
             f"LaTeX; análise real; projetos atlas-pdf e modelagem; {solved} problemas resolvidos no Codeforces como "
             f"{CODEFORCES_USER}.")
