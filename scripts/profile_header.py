@@ -1,67 +1,90 @@
 #!/usr/bin/env python3
-"""Gera o cabeçalho a partir das curvas já calculadas em zeta-{light,dark}.svg.
+"""Gera o cabeçalho editorial do perfil com uma curva de Hilbert de ordem 4.
 
-Execute python3 scripts/profile_header.py após atualizar a arte da zeta.
-Usa apenas a biblioteca padrão do Python.
+Uso: python3 scripts/profile_header.py (somente biblioteca padrão).
+Gera versões claras/escuras para desktop e celular em assets/profile-*.svg.
 """
 
-from copy import deepcopy
 from pathlib import Path
-import re
-import xml.etree.ElementTree as ET
 
 
 ASSETS = Path(__file__).resolve().parent.parent / "assets"
-NS = {"svg": "http://www.w3.org/2000/svg"}
-FONT = "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif"
-SERIF = "'STIX Two Text', Cambria, Georgia, 'Times New Roman', serif"
+SERIF = "Georgia, 'Times New Roman', serif"
+SANS = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif"
+MONO = "'SFMono-Regular', Consolas, 'Liberation Mono', monospace"
 THEMES = {
-    "light": dict(surface="#f6f8fa", border="#d1d9e0", grid="#e1e6eb",
-                  text="#1f2328", muted="#59636e", accent="#6250d6"),
-    "dark": dict(surface="#161b22", border="#3d444d", grid="#29313c",
-                 text="#f0f6fc", muted="#9198a1", accent="#9085e9"),
+    "light": dict(text="#242b29", muted="#59665f", line="#dce3df", ink="#41705f"),
+    "dark": dict(text="#e8ede9", muted="#a2b1a8", line="#2d3c34", ink="#8fb9a1"),
 }
 
 
-def header_art():
-    ET.register_namespace("", NS["svg"])
-    for theme, colors in THEMES.items():
-        source = ET.parse(ASSETS / f"zeta-{theme}.svg")
-        # Preserve the original samples and colors, without the reveal mask.
-        curve = deepcopy(source.find('.//svg:g[@stroke-width="1.8"]', NS))
-        points = [
-            tuple(map(float, point))
-            for path in curve
-            for point in re.findall(r"(-?[0-9.]+),(-?[0-9.]+)", path.attrib["d"])
-        ]
-        xs, ys = zip(*points)
-        left, right, top, bottom = 574, 956, 22, 203
-        scale = min((right - left) / (max(xs) - min(xs)),
-                    (bottom - top) / (max(ys) - min(ys)))
-        tx = (left + right - scale * (min(xs) + max(xs))) / 2
-        ty = (top + bottom - scale * (min(ys) + max(ys))) / 2
-        ox, oy = tx + 590 * scale, ty + 238 * scale
-        curve.set("stroke-width", f"{1.35 / scale:.3f}")
-        curve_svg = ET.tostring(curve, encoding="unicode")
-        svg = f'''<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="240" viewBox="0 0 1000 240" role="img" aria-labelledby="title description">
+def hilbert_points(order):
+    """Mapeia a distância percorrida para cada ponto da grade de Hilbert."""
+    side = 2 ** order
+    points = []
+    for distance in range(side * side):
+        x = y = 0
+        remaining = distance
+        size = 1
+        while size < side:
+            rx = (remaining // 2) & 1
+            ry = (remaining ^ rx) & 1
+            if ry == 0:
+                if rx == 1:
+                    x, y = size - 1 - x, size - 1 - y
+                x, y = y, x
+            x += size * rx
+            y += size * ry
+            remaining //= 4
+            size *= 2
+        points.append((x, y))
+    return points
+
+
+def render(theme, mobile=False):
+    colors = THEMES[theme]
+    width, height = (560, 246) if mobile else (1000, 280)
+    margin = 20 if mobile else 32
+    art_x, art_y, art_size = (382, 28, 146) if mobile else (722, 28, 196)
+    name_y, name_size = (103, 49) if mobile else (132, 76)
+    subtitle_y = 144 if mobile else 176
+    label_y = 47 if mobile else 61
+    points = [(art_x + x * art_size / 15, art_y + y * art_size / 15)
+              for x, y in hilbert_points(4)]
+    path = "M" + " L".join(f"{x:.2f},{y:.2f}" for x, y in points)
+    start, end = points[0], points[-1]
+    corners = " ".join(
+        f"M{x + dx * 8},{y} H{x} V{y + dy * 8}"
+        for x, y, dx, dy in (
+            (art_x - 8, art_y - 8, 1, 1),
+            (art_x + art_size + 8, art_y - 8, -1, 1),
+            (art_x - 8, art_y + art_size + 8, 1, -1),
+            (art_x + art_size + 8, art_y + art_size + 8, -1, -1),
+        )
+    )
+    return f'''<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}" role="img" aria-labelledby="title description">
 <title id="title">Luiz Felipe · Ciência da Computação · UFPel</title>
-<desc id="description">Matemática, arquitetura e sistemas. À direita, a curva de ζ(½ + it) no plano complexo, para 0 ≤ t ≤ 60.</desc>
-<rect x=".5" y=".5" width="999" height="239" rx="16" fill="{colors['surface']}" stroke="{colors['border']}"/>
-<g fill="none" stroke="{colors['grid']}" stroke-width="1">
-  <circle cx="{ox:.2f}" cy="{oy:.2f}" r="{86 * scale:.2f}"/>
-  <circle cx="{ox:.2f}" cy="{oy:.2f}" r="{172 * scale:.2f}"/>
-  <line x1="{left}" y1="{oy:.2f}" x2="{right}" y2="{oy:.2f}"/>
-  <line x1="{ox:.2f}" y1="{top}" x2="{ox:.2f}" y2="{bottom}"/>
-</g>
-<g transform="translate({tx:.4f} {ty:.4f}) scale({scale:.6f})" fill="none" stroke-linecap="round" stroke-linejoin="round">{curve_svg}</g>
-<circle cx="{ox:.2f}" cy="{oy:.2f}" r="2.4" fill="{colors['surface']}" stroke="{colors['accent']}" stroke-width="1.2"/>
-<text x="56" y="108" font-family="{FONT}" font-size="52" font-weight="650" letter-spacing="-1.5" fill="{colors['text']}">Luiz Felipe</text>
-<text x="58" y="145" font-family="{FONT}" font-size="19" fill="{colors['muted']}">Ciência da Computação · UFPel</text>
-<text x="58" y="182" font-family="{FONT}" font-size="15" fill="{colors['muted']}">Matemática · Arquitetura · Sistemas</text>
-<text x="765" y="224" text-anchor="middle" font-family="{SERIF}" font-size="14" fill="{colors['muted']}">ζ(½ + it) · 0 ≤ t ≤ 60</text>
+<desc id="description">Cabeçalho com tipografia serifada e uma curva de Hilbert de ordem 4 à direita, desenhada em verde suave.</desc>
+<text x="{margin}" y="{label_y}" font-family="{MONO}" font-size="12" fill="{colors['ink']}">matemática &amp; computação</text>
+<text x="{margin - 3}" y="{name_y}" font-family="{SERIF}" font-size="{name_size}" letter-spacing="-2" fill="{colors['text']}">Luiz Felipe</text>
+<text x="{margin}" y="{subtitle_y}" font-family="{SANS}" font-size="19" fill="{colors['muted']}">Ciência da Computação · UFPel</text>
+<text x="{margin}" y="{height - 39}" font-family="{MONO}" font-size="13" fill="{colors['muted']}">análise / arquitetura / sistemas</text>
+<path d="{corners}" fill="none" stroke="{colors['line']}" stroke-width="1"/>
+<path d="{path}" fill="none" stroke="{colors['ink']}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="{start[0]}" cy="{start[1]}" r="3" fill="{colors['ink']}"/>
+<circle cx="{end[0]}" cy="{end[1]}" r="3" fill="{colors['ink']}"/>
+<text x="{art_x + art_size / 2}" y="{art_y + art_size + 29}" font-family="{MONO}" font-size="10" text-anchor="middle" fill="{colors['muted']}">HILBERT / 04</text>
+<line x1="{margin}" y1="{height - 8}" x2="{width - margin}" y2="{height - 8}" stroke="{colors['line']}"/>
 </svg>
 '''
-        (ASSETS / f"header-{theme}.svg").write_text(svg, encoding="utf-8")
+
+
+def header_art():
+    ASSETS.mkdir(exist_ok=True)
+    for theme in THEMES:
+        for mobile in (False, True):
+            suffix = f"mobile-{theme}" if mobile else theme
+            (ASSETS / f"profile-{suffix}.svg").write_text(render(theme, mobile), encoding="utf-8")
 
 
 if __name__ == "__main__":

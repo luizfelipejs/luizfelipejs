@@ -1,29 +1,38 @@
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/header-dark.svg" />
-  <img src="assets/header-light.svg" width="100%" alt="Luiz Felipe · Ciência da Computação · UFPel. À direita, a curva da função zeta de Riemann ζ(½ + it), para 0 ≤ t ≤ 60." />
+  <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset="assets/profile-mobile-dark.svg" />
+  <source media="(max-width: 600px)" srcset="assets/profile-mobile-light.svg" />
+  <source media="(prefers-color-scheme: dark)" srcset="assets/profile-dark.svg" />
+  <img src="assets/profile-light.svg" width="100%" alt="Luiz Felipe — Ciência da Computação, UFPel. Arte geométrica de uma curva de Hilbert de ordem 4." />
 </picture>
 
-Estudo **Ciência da Computação na UFPel**, em Pelotas (RS). Me interesso por análise matemática, arquitetura de computadores e sistemas operacionais. Programo principalmente em **C, C++ e Python**.
+Entre a **análise matemática** e o funcionamento dos computadores. Estudo Ciência da Computação na UFPel, em Pelotas (RS), e programo principalmente em **C, C++ e Python**.
 
-[LinkedIn](https://www.linkedin.com/in/luiz-felipe-pereira-bandeira-8a51761b6/) · [Codeforces · root.svp](https://codeforces.com/profile/root.svp) · [Materiais de matemática](https://github.com/luizfelipejs/livros)
+[LinkedIn](https://www.linkedin.com/in/luiz-felipe-pereira-bandeira-8a51761b6/) &nbsp; / &nbsp; [Codeforces](https://codeforces.com/profile/root.svp) &nbsp; / &nbsp; [Notas e livros](https://github.com/luizfelipejs/livros)
 
-### Estudo e pesquisa
+### Interesses & pesquisa
 
-- **Análise:** análise real, espaços métricos e integração de Lebesgue; leituras de Elon Lages Lima, Abbott, Zorich e Folland.
-- **Iniciação científica:** modelagem matemática em controle populacional, EDPs e métodos de perturbação. Simulei um oscilador fracamente amortecido em Python, comparando aproximações assintóticas com a solução exata em um trabalho preparado para o CIC.
-- **Arquitetura e sistemas:** simulações de cache com SimpleScalar, concorrência com pthreads e implementação de estruturas de dados em C e C++.
+**Matemática.** Análise real, espaços métricos e integração de Lebesgue. Na iniciação científica, trabalhei com modelagem matemática em controle populacional e EDPs.
+
+**Sistemas.** Arquitetura de computadores, memória e concorrência: simulações de cache com SimpleScalar, threads com pthreads e estruturas de dados em C e C++.
 
 ### Projetos
 
-| Projeto | O que construí | Tecnologias |
-| :--- | :--- | :--- |
-| **Librarian** | Biblioteca de PDFs em um salão navegável, com estantes por assunto, busca e notas. | C++17 · Qt5 · SQLite |
-| **Atlas PDF** | Biblioteca de PDFs para Linux, com indexação por assunto e identificação de duplicatas. | Python · SQLite · Electron |
-| [**modelagem**](https://github.com/luizfelipejs/modelagem) | Experimentos com equações diferenciais, caos e modelos estatísticos. | Python |
+**Librarian** &nbsp; <sub>C++17 · Qt5 · SQLite</sub><br />
+Minha biblioteca de PDFs em um salão navegável, com estantes por assunto, busca e notas.
+
+**Atlas PDF** &nbsp; <sub>Python · SQLite · Electron</sub><br />
+Biblioteca de PDFs para Linux, com indexação por assunto e identificação de duplicatas.
+
+[**modelagem**](https://github.com/luizfelipejs/modelagem) &nbsp; <sub>Python</sub><br />
+Experimentos com equações diferenciais, caos e modelos estatísticos.
 
 ### Programação competitiva
 
-Treino no Codeforces e no AtCoder, principalmente em C++ e Python.
+Treino no Codeforces como **root.svp** e no AtCoder, principalmente em C++ e Python.
+
+<details>
+<summary>Estatísticas no Codeforces</summary>
+<br />
 
 <a href="https://codeforces.com/profile/root.svp">
   <picture>
@@ -32,4 +41,8 @@ Treino no Codeforces e no AtCoder, principalmente em C++ e Python.
   </picture>
 </a>
 
-<sub>No dia a dia: Linux, Bash e LaTeX.</sub>
+</details>
+
+---
+
+<sub>Linux · Bash · LaTeX &nbsp; / &nbsp; Pelotas, RS</sub>
