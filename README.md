@@ -2,7 +2,7 @@
   <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset="assets/neofetch-mobile-dark.svg" />
   <source media="(max-width: 600px)" srcset="assets/neofetch-mobile-light.svg" />
   <source media="(prefers-color-scheme: dark)" srcset="assets/neofetch-dark.svg" />
-  <img src="assets/neofetch-light.svg" width="749" alt="luiz@felipe — cartão no estilo neofetch. À esquerda, a curva da função zeta de Riemann ζ(½ + it) em pontos braille; à direita, Ciência da Computação na UFPel, C, C++ e Python, análise real e sistemas, projetos atlas-pdf e modelagem, e números do Codeforces e do GitHub." />
+  <img src="assets/neofetch-light.svg" width="576" alt="luiz@felipe — cartão no estilo neofetch. À esquerda, a curva da função zeta de Riemann ζ(½ + it) em pontos braille; à direita, Ciência da Computação na UFPel, C, C++ e Python, análise real e sistemas, projetos atlas-pdf e modelagem, e números do Codeforces e do GitHub." />
 </picture>
 
 <samp>Entre a análise matemática e o funcionamento dos computadores.</samp>

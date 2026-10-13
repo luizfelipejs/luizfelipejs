@@ -31,8 +31,8 @@ THEMES = {
 
 # size: corpo da fonte; cols: largura do texto em caracteres; art: colunas do desenho (0 = em cima do texto)
 LAYOUTS = {
-    "desktop": dict(size=12.5, lead=18, pad=18, art=34, gap=3, cols=58, short=False),
-    "mobile": dict(size=12.5, lead=18, pad=14, art=0, gap=0, cols=42, short=True, art_mobile=30),
+    "desktop": dict(size=11, lead=15, pad=14, art=28, gap=3, cols=52, short=False),
+    "mobile": dict(size=11, lead=15, pad=12, art=0, gap=0, cols=46, short=True, art_mobile=26),
 }
 
 
@@ -161,9 +161,7 @@ def lines(d, width, short):
         kv("Host", s("Universidade Federal de Pelotas", "UFPel"), width),
         kv("Kernel", "Ciência da Computação", width),
         kv("Shell", "zsh · bash", width),
-        [(". ", "dots")],
-        kv(s("Languages.Programming", "Languages"), "C, C++, Python", width),
-        kv(s("Languages.Typesetting", "Typesetting"), "LaTeX", width),
+        kv("Languages", "C, C++, Python, LaTeX", width),
         kv("Math", s("análise real, espaços métricos, Lebesgue", "análise real, Lebesgue"), width),
         kv("Systems", s("cache, memória, concorrência", "cache, concorrência"), width),
         section("Projects", width),
@@ -216,8 +214,8 @@ def render(d, theme, kind):
 
     caption = "ζ(½ + it), 0 ≤ t ≤ 50"
     art = (f'<g transform="translate(0 {art_y:.1f})">'
-           f'<path d="{path}" stroke="{c["text"]}" stroke-width="1.7" stroke-linecap="round"/>'
-           f'<circle cx="{origin[0]:.1f}" cy="{origin[1]:.1f}" r="3.2" fill="none" stroke="{c["key"]}" stroke-width="1.2"/>'
+           f'<path d="{path}" stroke="{c["text"]}" stroke-width="1.5" stroke-linecap="round"/>'
+           f'<circle cx="{origin[0]:.1f}" cy="{origin[1]:.1f}" r="2.8" fill="none" stroke="{c["key"]}" stroke-width="1.1"/>'
            + ty.text(art_x + art_cols * cw / 2, art_h + lead * 1.2, caption, "mono", size * 0.9, c["dots"], anchor="middle")
            + "</g>")
 
