@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
-"""Gera o cabeçalho do perfil e os títulos de seção.
+"""Gera o cabeçalho do perfil, os títulos de seção e os pequenos ornamentos.
 
 Uso: python3 scripts/profile_header.py (precisa do fontTools; veja design.py).
-Gera em assets/ as versões claras/escuras de profile[-mobile]-*.svg e section-*.svg.
+Gera em assets/ as versões claras/escuras de profile[-mobile]-*.svg, section-*.svg
+(cada título com um ornamento matemático), icon-*.svg (ícones dos projetos) e
+rule-*.svg (o fio do rodapé, uma função de Weierstrass).
 
 O cabeçalho é o nome e, ao lado, a curva de ζ(½ + it) no plano complexo para
 0 ≤ t ≤ 50. O eixo real nasce na linha de base do nome; a curva passa pela
@@ -11,11 +13,13 @@ origem a cada zero não trivial e vai clareando conforme t cresce.
 
 import math
 
+import ornaments
 from design import ASSETS, THEMES, Type, mix, path_d, svg
 
 T_MAX = 50.0
 BERNOULLI = (1 / 6, -1 / 30, 1 / 42, -1 / 30, 5 / 66, -691 / 2730, 7 / 6)  # B₂ … B₁₄
-SECTIONS = [("01", "Interesses", " & pesquisa"), ("02", "Projetos", ""), ("03", "Programação", " competitiva")]
+SECTIONS = [("Interesses", " & pesquisa", "cantor"), ("Projetos", "", "hilbert"),
+            ("Programação", " competitiva", "tree")]
 
 
 def zeta(s, n=30):
@@ -91,8 +95,8 @@ def curve_svg(c, ox, oy, scale):
 
 LAYOUTS = {
     # nome: (x, tamanho); a linha de base do nome é o eixo real da curva
-    "desktop": dict(scale=47, name=(-2, 66), subtitle=15, gap=58, top=8),
-    "mobile": dict(scale=29, name=(-1, 42), subtitle=12.5, gap=30, top=6),
+    "desktop": dict(scale=35, name=(-1.5, 50), subtitle=13, gap=40, top=6),
+    "mobile": dict(scale=27, name=(-1, 38), subtitle=12, gap=28, top=5),
 }
 
 
@@ -134,16 +138,42 @@ def hero(theme, kind):
     return svg(W, H, body, title="Luiz Felipe · Ciência da Computação · UFPel", desc=desc, defs=defs, css=css)
 
 
-def heading(theme, number, roman, italic):
+def emblem(kind, c, x, y):
+    """Ornamento de 28 × 20 px à esquerda de cada título."""
+    color = c["muted"]
+    if kind == "cantor":
+        return ornaments.cantor(color, x, y + 2, 27, 16, levels=4)
+    if kind == "hilbert":
+        return ornaments.hilbert(color, x + 4, y, 20)
+    return ornaments.tree(color, c["page"], x + 2, y + 2, 24, 16, depth=3)
+
+
+def heading(theme, roman, italic, kind):
     c, ty = THEMES[theme], Type()
-    size, base, x_title = 23, 30, 30
-    title = ty.text(1, base - 1, number, "mono", 10, c["muted"], tracking=0.1)
-    title += ty.text(x_title, base, roman, "serif", size, c["ink"], tracking=-0.005)
+    size, base, x_title = 19, 38, 40
+    title = ty.text(x_title, base, roman, "serif", size, c["ink"], tracking=-0.005)
     end = x_title + ty.width(roman, "serif", size, -0.005)
     if italic:
         title += ty.text(end, base, italic, "italic", size, c["ink"])
         end += ty.width(italic, "italic", size)
-    return svg(math.ceil(end + 4), 40, title, title=f"{number} — {roman}{italic}", defs=ty.defs())
+    body = emblem(kind, c, 1, base - 17) + title
+    return svg(math.ceil(end + 4), 46, body, title=f"{roman}{italic}", defs=ty.defs())
+
+
+def icon(theme, kind):
+    """Ícones dos projetos, do tamanho de uma letra maiúscula do texto do GitHub."""
+    c = THEMES[theme]
+    if kind == "atlas":
+        body, W, title = ornaments.shelf(c["ink"], 1.5, 2, 20, 14), 30, "Estante"
+    else:
+        body, W, title = ornaments.lorenz(c["ink"], 1, 1, 26, 16, 0.32, steps=4600), 28, "Atrator de Lorenz"
+    return svg(W, 18, body, title=title)
+
+
+def rule(theme):
+    c = THEMES[theme]
+    body = ornaments.weierstrass(c["muted"], 1, 2, 430, 14)
+    return svg(432, 18, body, title="Função de Weierstrass: contínua em todo ponto, derivável em nenhum")
 
 
 def main():
@@ -154,9 +184,12 @@ def main():
         files[f"profile-mobile-{theme}"] = hero(theme, "mobile")
         for n, section in enumerate(SECTIONS, 1):
             files[f"section-{n}-{theme}"] = heading(theme, *section)
+        for kind in ("atlas", "modelagem"):
+            files[f"icon-{kind}-{theme}"] = icon(theme, kind)
+        files[f"rule-{theme}"] = rule(theme)
     for name, doc in files.items():
         (ASSETS / f"{name}.svg").write_text(doc, encoding="utf-8")
-        print(f"{name}.svg  {len(doc) / 1024:.0f} KB")
+        print(f"{name}.svg  {len(doc) / 1024:.1f} KB")
 
 
 if __name__ == "__main__":
