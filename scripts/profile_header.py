@@ -132,20 +132,20 @@ def pulse_frames(fractions):
 
 LAYOUTS = {
     "desktop": dict(
-        W=1000, H=420, rx=22, pad=56,
-        eyebrow=(56, 82), name=(52, 196, 108), name_lines=False,
-        subtitle=(57, 240, 19, ["Ciência da Computação  ·  UFPel"]),
-        formula=(56, 312, 29), note=(57, 342), meta=(57, 378), rule=None,
-        plot=(492, 46, 400, 330), strip=(946, 74, 318),
-        caption=(492, 392, True),
+        W=1000, H=340, rx=20, pad=48,
+        eyebrow=(52, 66), name=(48, 158, 88), name_lines=False,
+        subtitle=(53, 196, 17, ["Ciência da Computação  ·  UFPel"]),
+        formula=(52, 244, 25), note=(53, 276), meta=(53, 306), rule=None,
+        plot=(430, 28, 420, 272), strip=(912, 58, 240),
+        caption=(470, 318, True),
     ),
     "mobile": dict(
-        W=480, H=490, rx=20, pad=26,
-        eyebrow=(26, 50), name=(23, 132, 68), name_lines=True,
-        subtitle=(27, 246, 15.5, ["Ciência da Computação", "UFPel  ·  Pelotas, RS"]),
-        formula=(26, 388, 25), note=(27, 416), meta=(27, 458), rule=(26, 334),
-        plot=(206, 60, 262, 236), strip=None,
-        caption=(276, 314, False),
+        W=480, H=420, rx=18, pad=24,
+        eyebrow=(24, 46), name=(21, 116, 58), name_lines=True,
+        subtitle=(25, 206, 14, ["Ciência da Computação", "UFPel  ·  Pelotas, RS"]),
+        formula=(24, 340, 22), note=(25, 364), meta=(25, 394), rule=(24, 292),
+        plot=(192, 50, 272, 210), strip=None,
+        caption=(262, 276, False),
     ),
 }
 

@@ -29,11 +29,13 @@ INTERESTS = [
 ]
 
 PROJECTS = {
-    "atlas": dict(number="01", title="Atlas PDF", stack=["PYTHON", "SQLITE", "ELECTRON"], link=None,
-                  fig="FIG. 4  ·  ESTANTE POR ASSUNTO, COM DUPLICATAS",
+    "atlas": dict(number="01", title="Atlas PDF", stack=["PYTHON", "SQLITE", "ELECTRON"],
+                  link="github.com/luizfelipejs/atlas-pdf", fig="FIG. 4  ·  ESTANTE POR ASSUNTO",
+                  about="estante com lombadas coloridas por assunto e um par de duplicatas ligado por um arco",
                   body="Biblioteca de PDFs para Linux, com indexação por assunto e identificação de duplicatas."),
     "modelagem": dict(number="02", title="modelagem", stack=["PYTHON"], link="github.com/luizfelipejs/modelagem",
-                      fig="FIG. 5  ·  ATRATOR DE LORENZ, σ = 10, ρ = 28, β = 8/3",
+                      fig="FIG. 5  ·  ATRATOR DE LORENZ",
+                      about="atrator de Lorenz com σ = 10, ρ = 28 e β = 8/3",
                       body="Experimentos com equações diferenciais, caos e modelos estatísticos."),
 }
 
@@ -42,18 +44,17 @@ PROJECTS = {
 
 def heading(theme, number, roman, italic):
     c, ty = THEMES[theme], Type()
-    size, base = 30, 40
-    x_title = 78
+    size, base, x_title = 24, 31, 60
     title = ty.text(x_title, base, roman, "serif", size, c["ink"], tracking=-0.005)
     end = x_title + ty.width(roman, "serif", size, -0.005)
     if italic:
         title += ty.text(end, base, italic, "italic", size, c["ink"])
         end += ty.width(italic, "italic", size)
-    W, H = math.ceil(end + 4), 56
-    title += ty.text(1, base - 2, number, "mono", 11, c["muted"], tracking=0.12)
+    title += ty.text(1, base - 1.5, number, "mono", 10, c["muted"], tracking=0.12)
+    W, H = math.ceil(end + 4), 42
     return f'''<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" role="img" aria-label="{escape(roman + italic)}">
 <defs>{ty.defs()}<linearGradient id="g" x1="0" x2="1">{gradient_stops(c["spectrum"])}</linearGradient></defs>
-<rect x="30" y="{base - 6.75}" width="36" height="1.5" fill="url(#g)"/>
+<rect x="25" y="{base - 5.5}" width="24" height="1.4" fill="url(#g)"/>
 {title}
 </svg>
 '''
@@ -61,15 +62,15 @@ def heading(theme, number, roman, italic):
 
 def link_pill(theme, label):
     c, ty = THEMES[theme], Type()
-    size, track = 10.5, 0.16
+    size, track = 9.5, 0.16
     text_w = ty.width(label, "mono", size, track)
-    W, H = math.ceil(text_w + ty.width("↗", "mono", 12) + 52), 36
-    text = (ty.text(30, H / 2 + 3.8, label, "mono", size, c["text"], tracking=track)
-            + ty.text(30 + text_w + 8, H / 2 + 4.2, "↗", "mono", 12, c["muted"]))
+    W, H = math.ceil(text_w + ty.width("↗", "mono", 11) + 44), 30
+    text = (ty.text(25, H / 2 + 3.4, label, "mono", size, c["text"], tracking=track)
+            + ty.text(25 + text_w + 7, H / 2 + 3.8, "↗", "mono", 11, c["muted"]))
     return f'''<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" role="img" aria-label="{escape(label.title())}">
 <defs>{ty.defs()}<linearGradient id="g" x1="0" x2="1">{gradient_stops(c["spectrum"])}</linearGradient></defs>
 <rect x=".5" y=".5" width="{W - 1}" height="{H - 1}" rx="{H / 2 - 0.5}" fill="{c["bg"]}" stroke="{c["border"]}"/>
-<circle cx="18" cy="{H / 2}" r="3" fill="url(#g)"/>
+<circle cx="15" cy="{H / 2}" r="2.6" fill="url(#g)"/>
 {text}
 </svg>
 '''
@@ -140,19 +141,19 @@ def fig_cache(c, ty, x, y, w, h, uid):
     stops = c["spectrum"]
     sets, ways, chosen, hit_way = 8, 4, 6, 1
     fields = [("tag", 23, 104, stops[0]), ("índice", 3, 46, stops[len(stops) // 2]), ("offset", 6, 54, stops[-1])]
-    bx, by, bh = x + 16, y + 34, 24
+    bx, by, bh = x + 16, y + h / 2 - 12, 22
     out, centers = [], {}
     for name, bits, fw, col in fields:
         out.append(f'<rect x="{bx:.1f}" y="{by}" width="{fw}" height="{bh}" rx="5" fill="{col}" opacity=".14"/>'
                    f'<rect x="{bx + .5:.1f}" y="{by + .5}" width="{fw - 1}" height="{bh - 1}" rx="4.5" fill="none" stroke="{col}" stroke-opacity=".8"/>')
-        out.append(ty.text(bx + fw / 2, by + 15.5, str(bits), "mono", 9.5, c["text"], anchor="middle"))
-        out.append(ty.text(bx + fw / 2, by - 9, name, "italic", 13, c["muted"], anchor="middle"))
+        out.append(ty.text(bx + fw / 2, by + 14.5, str(bits), "mono", 9, c["text"], anchor="middle"))
+        out.append(ty.text(bx + fw / 2, by - 8, name, "italic", 12.5, c["muted"], anchor="middle"))
         centers[name] = bx + fw / 2
         bx += fw + 4
-    out.append(ty.text(x + 16, y + h - 12, "ENDEREÇO DE 32 BITS", "mono", 8, c["muted"], tracking=0.12))
+    out.append(ty.text(x + 16, y + h - 10, "ENDEREÇO DE 32 BITS", "mono", 7.5, c["muted"], tracking=0.12))
 
-    gx, gy, gw, gh = x + w - 150, y + 16, 134, h - 32
-    cw, gap, row_gap = (gw - 3 * 4) / ways, 4, 3
+    gx, gy, gw, gh = x + w - 150, y + 12, 134, h - 24
+    cw, gap, row_gap = (gw - 3 * 4) / ways, 4, 2.5
     ch = (gh - (sets - 1) * row_gap) / sets
     rng = random.Random(7)
     cells = []
@@ -182,16 +183,16 @@ def fig_shelf(c, ty, x, y, w, h, uid):
     """Lombadas coloridas por assunto; um par de duplicatas ligado por um arco."""
     stops = c["spectrum"]
     rng = random.Random(4)
-    base = y + h - 30
+    base = y + h - 26
     subjects = [spectrum(stops, u) for u in (0.0, 0.33, 0.66, 1.0)]
     books, bx = [], x + 18
     while bx < x + w - 30:
         group = min(int((bx - x) / (w - 40) * 4), 3)
         bw = rng.choice((8, 9, 10, 12, 14))
-        bh = rng.randint(int(h * 0.38), int(h * 0.68))
+        bh = rng.randint(int(h * 0.3), int(h * 0.58))
         books.append([bx, bw, bh, subjects[group], rng.random(), rng.choice((2, 2, 3, 5))])
         bx += bw + books[-1][5]
-    a, b = 4, len(books) - 9
+    a, b = 3, len(books) - 5
     books[b][1:4] = books[a][1:4]  # a duplicata é idêntica: mesma largura, altura e assunto
     bx = x + 18
     for book in books:
@@ -208,10 +209,12 @@ def fig_shelf(c, ty, x, y, w, h, uid):
     (ax, aw, ah, *_), (bxx, bw2, bh2, *_) = books[a], books[b]
     x1, x2 = ax + aw / 2, bxx + bw2 / 2
     top = base - ah - 10
-    peak = y + 16
+    peak = y + 6
     out.append(f'<path class="dup{uid}" d="M{x1:.1f},{top:.1f}C{x1:.1f},{peak:.1f} {x2:.1f},{peak:.1f} {x2:.1f},{top:.1f}" fill="none" stroke="{c["ink"]}" stroke-width="1" stroke-dasharray="3 3"/>'
                f'<circle cx="{x1:.1f}" cy="{top:.1f}" r="2.4" fill="{c["ink"]}"/><circle cx="{x2:.1f}" cy="{top:.1f}" r="2.4" fill="{c["ink"]}"/>')
-    out.append(ty.text((x1 + x2) / 2, peak + 18, "≡", "mono", 13, c["ink"], anchor="middle"))
+    apex = 0.25 * top + 0.75 * peak  # ponto mais alto da curva de Bézier
+    out.append(f'<rect x="{(x1 + x2) / 2 - 8:.1f}" y="{apex - 7:.1f}" width="16" height="14" rx="4" fill="{c["bg"]}" stroke="{c["border"]}"/>')
+    out.append(ty.text((x1 + x2) / 2, apex + 4, "≡", "mono", 12, c["ink"], anchor="middle"))
     css = (f".dup{uid}{{animation:dup{uid} 1.6s linear infinite}}@keyframes dup{uid}{{to{{stroke-dashoffset:-12}}}}"
            f"@media (prefers-reduced-motion:reduce){{.dup{uid}{{animation:none}}}}")
     return "".join(out), "", css
@@ -240,7 +243,7 @@ def fig_lorenz(c, ty, x, y, w, h, uid):
     """Projeção x–z do atrator de Lorenz, desenhada aos poucos; a cor segue o tempo."""
     pts3 = lorenz()
     xs, zs = [p[0] for p in pts3], [p[2] for p in pts3]
-    pad = 22
+    pad = 14
     k = min((w - 2 * pad) / (max(xs) - min(xs)), (h - 2 * pad - 14) / (max(zs) - min(zs)))
     cx = x + w / 2 - k * (max(xs) + min(xs)) / 2
     cy = y + (h - 14) / 2 + k * (max(zs) + min(zs)) / 2
@@ -266,76 +269,75 @@ def figure(kind, c, ty, x, y, w, h, uid):
 
 def interests(theme, mobile):
     c, ty = THEMES[theme], Type()
-    k = 1.2 if mobile else 1.0  # no celular o cartão encolhe mais, então o texto miúdo cresce
-    W = 480 if mobile else 1000
-    col_w = W - 52 if mobile else (W - 3 * 40) / 2
-    fig_h = 104
-    body_size, lead = (16.5, 25) if mobile else (14.5, 22)
+    k = 1.15 if mobile else 1.0  # no celular o cartão encolhe mais, então o texto miúdo cresce
+    W, gutter = (480, 24) if mobile else (1000, 36)
+    col_w = W - 2 * gutter if mobile else (W - 3 * gutter) / 2
+    fig_h = 92 if mobile else 84
+    body_size, lead = (15.5, 23) if mobile else (13.5, 20.5)
     blocks, defs, css = [], [], []
     y_end = 0
     for i, (item, kind) in enumerate(zip(INTERESTS, ("weierstrass", "cache"))):
-        x0 = 26 if mobile else 40 + i * (col_w + 40)
-        y0 = (y_end if mobile and i else 26) + 10
+        x0 = gutter if mobile else gutter + i * (col_w + gutter)
+        y0 = (y_end if mobile and i else 14) + 8
         art, d, s = figure(kind, c, ty, x0, y0, col_w, fig_h, i)
         defs.append(d)
         css.append(s)
         top = y0 + fig_h
         blocks.append(art)
-        blocks.append(ty.text(x0, top + 22, item["fig"], "mono", 8.5 * k, c["muted"], tracking=0.1))
-        blocks.append(ty.text(x0, top + 70, item["title"], "serif", 32 * k ** 0.5, c["ink"], tracking=-0.01))
-        blocks.append(ty.text(x0 + col_w, top + 68, item["kicker"], "mono", 9 * k, c["muted"], tracking=0.14,
+        blocks.append(ty.text(x0, top + 19, item["fig"], "mono", 8 * k, c["muted"], tracking=0.1))
+        blocks.append(ty.text(x0, top + 56, item["title"], "serif", 26 * k, c["ink"], tracking=-0.01))
+        blocks.append(ty.text(x0 + col_w, top + 54, item["kicker"], "mono", 8.5 * k, c["muted"], tracking=0.14,
                               anchor="end"))
         lines = ty.wrap(item["body"], "sans", body_size, col_w)
         for j, line in enumerate(lines):
-            blocks.append(ty.text(x0, top + 100 + j * lead, line, "sans", body_size, c["text"], tracking=-0.005))
-        y_end = max(y_end, top + 100 + (len(lines) - 1) * lead + 10)
+            blocks.append(ty.text(x0, top + 80 + j * lead, line, "sans", body_size, c["text"], tracking=-0.005))
+        y_end = max(y_end, top + 80 + (len(lines) - 1) * lead + 8)
         if mobile and i == 0:
-            blocks.append(f'<rect x="26" y="{y_end + 20:.1f}" width="{W - 52}" height="1" fill="{c["grid"]}"/>')
-            y_end += 46
+            blocks.append(f'<rect x="{gutter}" y="{y_end + 16:.1f}" width="{W - 2 * gutter}" height="1" fill="{c["grid"]}"/>')
+            y_end += 34
     if not mobile:
-        blocks.append(f'<rect x="{W / 2 - .5}" y="40" width="1" height="{y_end - 40:.1f}" fill="{c["grid"]}"/>')
-    H = math.ceil(y_end + 30)
+        blocks.append(f'<rect x="{W / 2 - .5}" y="30" width="1" height="{y_end - 30:.1f}" fill="{c["grid"]}"/>')
+    H = math.ceil(y_end + 24)
     desc = " ".join(f'{item["title"]}: {item["body"]}' for item in INTERESTS)
     return card(W, H, c, "".join(blocks), title="Interesses e pesquisa", desc=desc,
-                defs=ty.defs() + "".join(defs), css="".join(css), theme=theme)
+                defs=ty.defs() + "".join(defs), css="".join(css), rx=16, theme=theme)
 
 
 def project(theme, mobile, key, kind):
     c, ty, p = THEMES[theme], Type(), PROJECTS[key]
-    k = 1.2 if mobile else 1.0
+    k = 1.15 if mobile else 1.0
     if mobile:
-        W, fig = 480, (20, 20, 440, 176)
-        tx, tw, top = 26, 428, 20 + 176 + 46
+        W, fig = 480, (18, 18, 444, 150)
+        tx, tw, top = 24, 432, 18 + 150 + 40
     else:
-        W, fig = 1000, (22, 22, 330, 196)
-        tx, tw, top = 392, 560, 62
+        W, fig = 1000, (18, 18, 270, 150)
+        tx, tw, top = 320, 620, 52
     art, d, s = figure(kind, c, ty, *fig, 0)
     fx, fy, fw, fh = fig
-    out = [art, ty.text(fx + 14, fy + fh - 13, p["fig"], "mono", 7.5 * k, c["muted"], tracking=0.08),
-           ty.text(tx, top, f"PROJETO {p['number']}", "mono", 9.5 * k, c["muted"], tracking=0.16),
-           ty.text(tx - 2, top + 50, p["title"], "serif", 44, c["ink"], tracking=-0.012)]
-    body_size, lead = (18, 26) if mobile else (16, 24)
+    out = [art, ty.text(fx + 12, fy + fh - 11, p["fig"], "mono", 7.5 * k, c["muted"], tracking=0.08),
+           ty.text(tx, top, f"PROJETO {p['number']}", "mono", 8.5 * k, c["muted"], tracking=0.16),
+           ty.text(tx - 1.5, top + 40, p["title"], "serif", 34 * k, c["ink"], tracking=-0.012)]
+    body_size, lead = (16, 23) if mobile else (14.5, 21)
     lines = ty.wrap(p["body"], "sans", body_size, tw)
-    y = top + 84
+    y = top + 68
     for j, line in enumerate(lines):
         out.append(ty.text(tx, y + j * lead, line, "sans", body_size, c["text"], tracking=-0.005))
-    y += (len(lines) - 1) * lead + 34 * k
+    y += (len(lines) - 1) * lead + 30 * k
 
-    x, tag_size = tx, 9 * k
+    x, tag_size = tx, 8.5 * k
     for tag in p["stack"]:
         tag_w = ty.width(tag, "mono", tag_size, 0.14)
-        out.append(f'<rect x="{x + .5:.1f}" y="{y - 14.5 * k:.1f}" width="{tag_w + 20:.1f}" height="{22 * k:.1f}" '
-                   f'rx="{11 * k:.1f}" fill="none" stroke="{c["border"]}"/>')
-        out.append(ty.text(x + 10, y + 0.5, tag, "mono", tag_size, c["text"], tracking=0.14))
-        x += tag_w + 28
+        out.append(f'<rect x="{x + .5:.1f}" y="{y - 13.5 * k:.1f}" width="{tag_w + 18:.1f}" height="{20 * k:.1f}" '
+                   f'rx="{10 * k:.1f}" fill="none" stroke="{c["border"]}"/>')
+        out.append(ty.text(x + 9, y + 0.5, tag, "mono", tag_size, c["text"], tracking=0.14))
+        x += tag_w + 26
     if p["link"]:
-        lx, y = (tx, y + 40) if mobile else (W - 30, y)
-        out.append(ty.text(lx, y, p["link"] + "  ↗", "mono", 10 * k, c["muted"], tracking=0.02,
+        lx, y = (tx, y + 36) if mobile else (W - 28, y)
+        out.append(ty.text(lx, y, p["link"] + "  ↗", "mono", 9.5 * k, c["muted"], tracking=0.02,
                            anchor="start" if mobile else "end"))
-    H = math.ceil(y + 30) if mobile else max(fy + fh + 22, math.ceil(y + 30))
-    detail = p["fig"].split("·", 1)[1].strip()
-    return card(W, H, c, "".join(out), title=p["title"], desc=f'{p["title"]}: {p["body"]} Figura: {detail}.',
-                defs=ty.defs() + d, css=s, theme=theme)
+    H = math.ceil(y + 26) if mobile else max(fy + fh + 18, math.ceil(y + 26))
+    return card(W, H, c, "".join(out), title=p["title"], desc=f'{p["title"]}: {p["body"]} Figura: {p["about"]}.',
+                defs=ty.defs() + d, css=s, rx=16, theme=theme)
 
 
 def main():

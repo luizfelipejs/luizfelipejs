@@ -33,8 +33,8 @@ RANK_COLORS = {
 }
 
 LAYOUTS = {
-    "desktop": dict(W=1000, pad=40, stat_cols=4, stat_y=(166, 70), charts_y=256, chart_h=128, side_by_side=True),
-    "mobile": dict(W=480, pad=26, stat_cols=2, stat_y=(156, 84), charts_y=344, chart_h=132, side_by_side=False),
+    "desktop": dict(W=1000, pad=36, stat_cols=4, stat_y=(142, 62), charts_y=218, chart_h=112, side_by_side=True),
+    "mobile": dict(W=480, pad=24, stat_cols=2, stat_y=(138, 74), charts_y=290, chart_h=120, side_by_side=False),
 }
 
 
@@ -83,11 +83,11 @@ def header(d, c, ty, theme, x, right):
     rank = d["rank"].upper()
     rank_w = ty.width(rank, "mono", 9.5, 0.16)
     chip_x = right - rank_w - 34
-    return (ty.text(x, 50, "CODEFORCES", "mono", 9.5, c["muted"], tracking=0.16)
-            + ty.text(x - 1, 84, d["handle"], "italic", 30, c["ink"])
-            + f'<rect x="{chip_x:.1f}" y="44.5" width="{rank_w + 34:.1f}" height="26" rx="13" fill="none" stroke="{c["border"]}"/>'
-            + f'<circle cx="{chip_x + 14:.1f}" cy="57.5" r="3.5" fill="{rank_color}"/>'
-            + ty.text(chip_x + 24, 61, rank, "mono", 9.5, c["text"], tracking=0.16))
+    return (ty.text(x, 46, "CODEFORCES", "mono", 9, c["muted"], tracking=0.16)
+            + ty.text(x - 1, 74, d["handle"], "italic", 24, c["ink"])
+            + f'<rect x="{chip_x:.1f}" y="38.5" width="{rank_w + 34:.1f}" height="24" rx="12" fill="none" stroke="{c["border"]}"/>'
+            + f'<circle cx="{chip_x + 14:.1f}" cy="50.5" r="3.2" fill="{rank_color}"/>'
+            + ty.text(chip_x + 24, 54, rank, "mono", 9, c["text"], tracking=0.16))
 
 
 def stats(d, c, ty, x0, width, cols, y, row_h):
@@ -98,9 +98,9 @@ def stats(d, c, ty, x0, width, cols, y, row_h):
     for i, (label, value) in enumerate(items):
         x = x0 + (i % cols) * col
         yy = y + (i // cols) * row_h
-        out.append(ty.text(x - 2, yy, str(value), "serif", 54, c["ink"], features=("lnum",)))
-        out.append(f'<rect x="{x:.1f}" y="{yy + 13}" width="18" height="1.5" fill="{spectrum(c["spectrum"], i / 3)}"/>')
-        out.append(ty.text(x, yy + 32, label, "mono", 9, c["muted"], tracking=0.16))
+        out.append(ty.text(x - 1.5, yy, str(value), "serif", 42, c["ink"], features=("lnum",)))
+        out.append(f'<rect x="{x:.1f}" y="{yy + 11}" width="16" height="1.4" fill="{spectrum(c["spectrum"], i / 3)}"/>')
+        out.append(ty.text(x, yy + 28, label, "mono", 8.5, c["muted"], tracking=0.16))
     return out
 
 
@@ -176,13 +176,13 @@ def tags_block(d, c, ty, x, y, width):
     if not d["tags"]:
         return [], y
     out = [ty.text(x, y, "TAGS MAIS RESOLVIDAS", "mono", 9, c["muted"], tracking=0.16)]
-    cx, cy = x, y + 26
+    cx, cy = x, y + 24
     for tag, n in d["tags"]:
-        tag_w = ty.width(tag, "sans", 14)
+        tag_w = ty.width(tag, "sans", 13)
         count_w = ty.width(str(n), "mono", 10)
         if cx + tag_w + count_w + 6 > x + width:
-            cx, cy = x, cy + 24
-        out.append(ty.text(cx, cy, tag, "sans", 14, c["text"]))
+            cx, cy = x, cy + 22
+        out.append(ty.text(cx, cy, tag, "sans", 13, c["text"]))
         out.append(ty.text(cx + tag_w + 6, cy, str(n), "mono", 10, c["muted"]))
         cx += tag_w + count_w + 26
     return out, cy
@@ -195,7 +195,7 @@ def render(d, theme, kind):
     rows = math.ceil(4 / L["stat_cols"])
     body = [header(d, c, ty, theme, pad, W - pad)]
     body += stats(d, c, ty, pad, W - 2 * pad, L["stat_cols"], stat_y, row_h)
-    rule_y = stat_y + (rows - 1) * row_h + 56
+    rule_y = stat_y + (rows - 1) * row_h + 46
     body.append(f'<rect x="{pad}" y="{rule_y}" width="{W - 2 * pad}" height="1" fill="{c["grid"]}"/>')
 
     y, ch = L["charts_y"], L["chart_h"]
@@ -203,15 +203,15 @@ def render(d, theme, kind):
         half = (W - 2 * pad - 60) / 2
         body += rating_chart(d, c, ty, pad, y, half, ch)
         body += difficulty_chart(d, c, ty, pad + half + 60, y, half, ch)
-        y += ch + 36
+        y += ch + 30
     else:
         body += rating_chart(d, c, ty, pad, y, W - 2 * pad, ch)
-        y += ch + 40
+        y += ch + 34
         body += difficulty_chart(d, c, ty, pad, y, W - 2 * pad, ch)
-        y += ch + 36
+        y += ch + 30
     tags, y = tags_block(d, c, ty, pad, y, W - 2 * pad)
     body += tags
-    H = math.ceil(y + 34)
+    H = math.ceil(y + 28)
 
     stops = c["spectrum"]
     defs = (ty.defs()
@@ -220,7 +220,7 @@ def render(d, theme, kind):
               f'<stop offset="1" stop-color="{spectrum(stops, .4)}" stop-opacity="0"/></linearGradient>')
     desc = (f'{d["handle"]} no Codeforces: rating {d["rating"]} ({d["rank"]}), máximo {d["max_rating"]}, '
             f'{d["solved"]} problemas resolvidos em {len(d["history"])} contests.')
-    return card(W, H, c, "".join(body), title="Estatísticas no Codeforces", desc=desc, defs=defs, theme=theme)
+    return card(W, H, c, "".join(body), title="Estatísticas no Codeforces", desc=desc, defs=defs, rx=16, theme=theme)
 
 
 def main():
