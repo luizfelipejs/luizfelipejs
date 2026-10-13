@@ -1,32 +1,63 @@
+<p>
 <picture>
   <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset="assets/profile-mobile-dark.svg" />
   <source media="(max-width: 600px)" srcset="assets/profile-mobile-light.svg" />
   <source media="(prefers-color-scheme: dark)" srcset="assets/profile-dark.svg" />
-  <img src="assets/profile-light.svg" width="100%" alt="Luiz Felipe — Ciência da Computação, UFPel. Arte geométrica de uma curva de Hilbert de ordem 4." />
+  <img src="assets/profile-light.svg" width="100%" alt="Luiz Felipe — Ciência da Computação, UFPel. Ao lado do nome, a curva da função zeta de Riemann ζ(½ + it) no plano complexo, que passa pela origem a cada zero não trivial." />
 </picture>
+</p>
 
 Entre a **análise matemática** e o funcionamento dos computadores. Estudo Ciência da Computação na UFPel, em Pelotas (RS), e programo principalmente em **C, C++ e Python**.
 
-[LinkedIn](https://www.linkedin.com/in/luiz-felipe-pereira-bandeira-8a51761b6/) &nbsp; / &nbsp; [Codeforces](https://codeforces.com/profile/root.svp) &nbsp; / &nbsp; [Notas e livros](https://github.com/luizfelipejs/livros)
+<a href="https://www.linkedin.com/in/luiz-felipe-pereira-bandeira-8a51761b6/"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/link-linkedin-dark.svg" /><img src="assets/link-linkedin-light.svg" width="122" alt="LinkedIn" /></picture></a>
+<a href="https://codeforces.com/profile/root.svp"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/link-codeforces-dark.svg" /><img src="assets/link-codeforces-light.svg" width="138" alt="Codeforces" /></picture></a>
+<a href="https://github.com/luizfelipejs/livros"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/link-livros-dark.svg" /><img src="assets/link-livros-light.svg" width="170" alt="Notas e livros" /></picture></a>
 
-### Interesses & pesquisa
+<br />
 
-**Matemática.** Análise real, espaços métricos e integração de Lebesgue. Na iniciação científica, trabalhei com modelagem matemática em controle populacional e EDPs.
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/section-1-dark.svg" />
+  <img src="assets/section-1-light.svg" width="324" alt="01 — Interesses & pesquisa" />
+</picture>
 
-**Sistemas.** Arquitetura de computadores, memória e concorrência: simulações de cache com SimpleScalar, threads com pthreads e estruturas de dados em C e C++.
+<p>
+<picture>
+  <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset="assets/interests-mobile-dark.svg" />
+  <source media="(max-width: 600px)" srcset="assets/interests-mobile-light.svg" />
+  <source media="(prefers-color-scheme: dark)" srcset="assets/interests-dark.svg" />
+  <img src="assets/interests-light.svg" width="100%" alt="Matemática: análise real, espaços métricos e integração de Lebesgue; na iniciação científica, modelagem matemática em controle populacional e EDPs. Sistemas: arquitetura de computadores, memória e concorrência, com simulações de cache no SimpleScalar, threads com pthreads e estruturas de dados em C e C++." />
+</picture>
+</p>
 
-### Projetos
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/section-2-dark.svg" />
+  <img src="assets/section-2-light.svg" width="175" alt="02 — Projetos" />
+</picture>
 
-**Librarian** &nbsp; <sub>C++17 · Qt5 · SQLite</sub><br />
-Minha biblioteca de PDFs em um salão navegável, com estantes por assunto, busca e notas.
+<p>
+<picture>
+  <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset="assets/project-atlas-mobile-dark.svg" />
+  <source media="(max-width: 600px)" srcset="assets/project-atlas-mobile-light.svg" />
+  <source media="(prefers-color-scheme: dark)" srcset="assets/project-atlas-dark.svg" />
+  <img src="assets/project-atlas-light.svg" width="100%" alt="Atlas PDF (Python, SQLite, Electron): biblioteca de PDFs para Linux, com indexação por assunto e identificação de duplicatas." />
+</picture>
+</p>
 
-**Atlas PDF** &nbsp; <sub>Python · SQLite · Electron</sub><br />
-Biblioteca de PDFs para Linux, com indexação por assunto e identificação de duplicatas.
+<p>
+<a href="https://github.com/luizfelipejs/modelagem">
+<picture>
+  <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset="assets/project-modelagem-mobile-dark.svg" />
+  <source media="(max-width: 600px)" srcset="assets/project-modelagem-mobile-light.svg" />
+  <source media="(prefers-color-scheme: dark)" srcset="assets/project-modelagem-dark.svg" />
+  <img src="assets/project-modelagem-light.svg" width="100%" alt="modelagem (Python): experimentos com equações diferenciais, caos e modelos estatísticos." />
+</picture>
+</a>
+</p>
 
-[**modelagem**](https://github.com/luizfelipejs/modelagem) &nbsp; <sub>Python</sub><br />
-Experimentos com equações diferenciais, caos e modelos estatísticos.
-
-### Programação competitiva
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/section-3-dark.svg" />
+  <img src="assets/section-3-light.svg" width="366" alt="03 — Programação competitiva" />
+</picture>
 
 Treino no Codeforces como **root.svp** e no AtCoder, principalmente em C++ e Python.
 
@@ -36,6 +67,8 @@ Treino no Codeforces como **root.svp** e no AtCoder, principalmente em C++ e Pyt
 
 <a href="https://codeforces.com/profile/root.svp">
   <picture>
+    <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset="assets/codeforces-mobile-dark.svg" />
+    <source media="(max-width: 600px)" srcset="assets/codeforces-mobile-light.svg" />
     <source media="(prefers-color-scheme: dark)" srcset="assets/codeforces-dark.svg" />
     <img src="assets/codeforces-light.svg" width="100%" alt="Estatísticas de root.svp no Codeforces: rating, problemas resolvidos e evolução por contest." />
   </picture>

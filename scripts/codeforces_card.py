@@ -1,37 +1,23 @@
 #!/usr/bin/env python3
-"""Gera assets/codeforces-{light,dark}.svg com dados da API pública do Codeforces.
+"""Gera assets/codeforces[-mobile]-{light,dark}.svg com dados da API pública do Codeforces.
 
 Uso: python3 scripts/codeforces_card.py root.svp
 Se a API falhar, sai com erro e não mexe nos arquivos existentes.
+Usa a mesma base visual dos outros cartões (design.py), então precisa do
+fontTools e das fontes EB Garamond, Inter e JetBrains Mono.
 """
 
 import json
+import math
 import sys
 import time
 import urllib.request
 from collections import Counter
 from datetime import datetime, timezone
-from html import escape
-from pathlib import Path
+
+from design import ASSETS, THEMES, Type, card, gradient_stops, spectrum
 
 API = "https://codeforces.com/api/"
-OUT = Path(__file__).resolve().parent.parent / "assets"
-
-W, H = 840, 360
-PAD = 24
-FONT = "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif"
-MONO = "ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace"
-
-THEMES = {
-    "light": {
-        "surface": "#f6f8fa", "border": "#d1d9e0", "grid": "#e1e6eb",
-        "text": "#1f2328", "muted": "#59636e", "accent": "#2a78d6",
-    },
-    "dark": {
-        "surface": "#161b22", "border": "#3d444d", "grid": "#262c35",
-        "text": "#f0f6fc", "muted": "#9198a1", "accent": "#3987e5",
-    },
-}
 
 RANK_COLORS = {
     "newbie": ("#808080", "#9198a1"),
@@ -44,6 +30,11 @@ RANK_COLORS = {
     "grandmaster": ("#ff0000", "#ff6b6b"),
     "international grandmaster": ("#ff0000", "#ff6b6b"),
     "legendary grandmaster": ("#ff0000", "#ff6b6b"),
+}
+
+LAYOUTS = {
+    "desktop": dict(W=1000, pad=40, stat_cols=4, stat_y=(166, 70), charts_y=256, chart_h=128, side_by_side=True),
+    "mobile": dict(W=480, pad=26, stat_cols=2, stat_y=(156, 84), charts_y=344, chart_h=132, side_by_side=False),
 }
 
 
@@ -87,44 +78,39 @@ def collect(handle):
     }
 
 
-def text(x, y, content, size, fill, weight=400, anchor="start", family=FONT):
-    return (f'<text x="{x:.1f}" y="{y:.1f}" font-family="{family}" font-size="{size}" '
-            f'font-weight="{weight}" fill="{fill}" text-anchor="{anchor}">{escape(str(content))}</text>')
+def header(d, c, ty, theme, x, right):
+    rank_color = RANK_COLORS.get(d["rank"], ("#808080", "#9198a1"))[0 if theme == "light" else 1]
+    rank = d["rank"].upper()
+    rank_w = ty.width(rank, "mono", 9.5, 0.16)
+    chip_x = right - rank_w - 34
+    return (ty.text(x, 50, "CODEFORCES", "mono", 9.5, c["muted"], tracking=0.16)
+            + ty.text(x - 1, 84, d["handle"], "italic", 30, c["ink"])
+            + f'<rect x="{chip_x:.1f}" y="44.5" width="{rank_w + 34:.1f}" height="26" rx="13" fill="none" stroke="{c["border"]}"/>'
+            + f'<circle cx="{chip_x + 14:.1f}" cy="57.5" r="3.5" fill="{rank_color}"/>'
+            + ty.text(chip_x + 24, 61, rank, "mono", 9.5, c["text"], tracking=0.16))
 
 
-def bar(x, y, w, h, r, fill):
-    """Barra com só os cantos de cima arredondados, presa na linha de base."""
-    r = min(r, w / 2, h)
-    return (f'<path d="M{x:.1f},{y + h:.1f} V{y + r:.1f} Q{x:.1f},{y:.1f} {x + r:.1f},{y:.1f} '
-            f'H{x + w - r:.1f} Q{x + w:.1f},{y:.1f} {x + w:.1f},{y + r:.1f} V{y + h:.1f} Z" fill="{fill}"/>')
-
-
-def stat_tiles(d, t):
-    labels = [("Rating atual", d["rating"]), ("Rating máximo", d["max_rating"]),
-              ("Problemas resolvidos", d["solved"]), ("Contests", len(d["history"]))]
-    col = (W - 2 * PAD) / len(labels)
+def stats(d, c, ty, x0, width, cols, y, row_h):
+    items = [("RATING ATUAL", d["rating"]), ("RATING MÁXIMO", d["max_rating"]),
+             ("RESOLVIDOS", d["solved"]), ("CONTESTS", len(d["history"]))]
+    col = width / cols
     out = []
-    for i, (label, value) in enumerate(labels):
-        x = PAD + i * col
-        out.append(text(x, 104, value, 30, t["text"], 600))
-        out.append(text(x, 126, label, 13, t["muted"]))
+    for i, (label, value) in enumerate(items):
+        x = x0 + (i % cols) * col
+        yy = y + (i // cols) * row_h
+        out.append(ty.text(x - 2, yy, str(value), "serif", 54, c["ink"], features=("lnum",)))
+        out.append(f'<rect x="{x:.1f}" y="{yy + 13}" width="18" height="1.5" fill="{spectrum(c["spectrum"], i / 3)}"/>')
+        out.append(ty.text(x, yy + 32, label, "mono", 9, c["muted"], tracking=0.16))
     return out
 
 
-def rank_chip(d, t, theme):
-    color = RANK_COLORS.get(d["rank"], ("#808080", "#9198a1"))[0 if theme == "light" else 1]
-    return [f'<circle cx="{PAD + 104}" cy="37" r="4" fill="{color}"/>',
-            text(PAD + 114, 42, d["rank"], 13, t["muted"])]
-
-
-def rating_chart(d, t, x0, y0, w, h):
-    out = [text(x0, y0, "Rating por contest", 13, t["muted"], 600)]
+def rating_chart(d, c, ty, x0, y0, w, h):
+    out = [ty.text(x0, y0, "RATING POR CONTEST", "mono", 9, c["muted"], tracking=0.16)]
     pts = d["history"]
     if not pts:
-        return out + [text(x0, y0 + h / 2, "sem contests ainda", 13, t["muted"])]
+        return out + [ty.text(x0, y0 + h / 2, "sem contests ainda", "italic", 15, c["muted"])]
 
-    left, top, bottom = x0 + 34, y0 + 22, y0 + h - 22
-    right = x0 + w - 30
+    left, top, bottom, right = x0 + 34, y0 + 22, y0 + h - 22, x0 + w - 34
     ratings = [r for _, r in pts]
     lo = max(0, (min(ratings) // 100) * 100)
     step = max(100, -(-(max(ratings) - lo) // 200) * 100)
@@ -138,81 +124,113 @@ def rating_chart(d, t, x0, y0, w, h):
         return bottom - (bottom - top) * (r - lo) / (hi - lo)
 
     for v in (lo, lo + step, hi):
-        out.append(f'<line x1="{left}" x2="{right}" y1="{sy(v):.1f}" y2="{sy(v):.1f}" stroke="{t["grid"]}" stroke-width="1"/>')
-        out.append(text(left - 8, sy(v) + 4, v, 11, t["muted"], anchor="end"))
+        out.append(f'<path d="M{left},{sy(v):.1f}H{right}" stroke="{c["grid"]}" stroke-dasharray="2 4"/>')
+        out.append(ty.text(left - 10, sy(v) + 3.5, str(v), "mono", 9, c["muted"], anchor="end"))
 
-    coords = " ".join(f"{sx(ts):.1f},{sy(r):.1f}" for ts, r in pts)
-    out.append(f'<polyline points="{coords}" fill="none" stroke="{t["accent"]}" stroke-width="2" '
+    xy = [(sx(ts), sy(r)) for ts, r in pts]
+    line = " ".join(f"{x:.1f},{y:.1f}" for x, y in xy)
+    area = f"M{xy[0][0]:.1f},{bottom}L{line.replace(' ', 'L')}L{xy[-1][0]:.1f},{bottom}Z"
+    out.append(f'<path d="{area}" fill="url(#area)"/>')
+    out.append(f'<polyline points="{line}" fill="none" stroke="url(#stroke)" stroke-width="2" '
                f'stroke-linejoin="round" stroke-linecap="round"/>')
-    for ts, r in pts:
-        out.append(f'<circle cx="{sx(ts):.1f}" cy="{sy(r):.1f}" r="4" fill="{t["accent"]}" '
-                   f'stroke="{t["surface"]}" stroke-width="2"/>')
-    last_ts, last_r = pts[-1]
-    out.append(text(sx(last_ts) + 9, sy(last_r) + 4, last_r, 12, t["text"], 600))
+    for i, (x, y) in enumerate(xy):
+        col = spectrum(c["spectrum"], (x - left) / max(right - left, 1))
+        out.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="4" fill="{c["bg"]}" stroke="{col}" stroke-width="2"/>')
+    out.append(ty.text(xy[-1][0] + 10, xy[-1][1] + 4, str(pts[-1][1]), "mono", 11, c["ink"]))
 
     fmt = lambda ts: datetime.fromtimestamp(ts, timezone.utc).strftime("%d/%m/%y")
-    out.append(text(left, bottom + 18, fmt(t0), 11, t["muted"]))
+    out.append(ty.text(left, bottom + 18, fmt(t0), "mono", 9, c["muted"]))
     if t1 > t0:
-        out.append(text(right, bottom + 18, fmt(t1), 11, t["muted"], anchor="end"))
+        out.append(ty.text(right, bottom + 18, fmt(t1), "mono", 9, c["muted"], anchor="end"))
     return out
 
 
-def difficulty_chart(d, t, x0, y0, w, h):
-    out = [text(x0, y0, "Resolvidos por dificuldade", 13, t["muted"], 600)]
+def bar(x, y, w, h, r, fill):
+    """Barra com só os cantos de cima arredondados, presa na linha de base."""
+    r = min(r, w / 2, h)
+    return (f'<path d="M{x:.1f},{y + h:.1f} V{y + r:.1f} Q{x:.1f},{y:.1f} {x + r:.1f},{y:.1f} '
+            f'H{x + w - r:.1f} Q{x + w:.1f},{y:.1f} {x + w:.1f},{y + r:.1f} V{y + h:.1f} Z" fill="{fill}"/>')
+
+
+def difficulty_chart(d, c, ty, x0, y0, w, h):
+    out = [ty.text(x0, y0, "RESOLVIDOS POR DIFICULDADE", "mono", 9, c["muted"], tracking=0.16)]
     buckets = d["by_rating"]
     if not buckets:
         return out
-    top, bottom = y0 + 26, y0 + h - 22
+    top, bottom = y0 + 30, y0 + h - 22
     peak = max(n for _, n in buckets)
     slot = w / len(buckets)
-    bw = min(40, slot * 0.6)
-    out.append(f'<line x1="{x0}" x2="{x0 + w}" y1="{bottom}" y2="{bottom}" stroke="{t["grid"]}" stroke-width="1"/>')
+    bw = min(44, slot * 0.58)
+    out.append(f'<rect x="{x0}" y="{bottom}" width="{w}" height="1" fill="{c["axis"]}"/>')
     for i, (rating, n) in enumerate(buckets):
         cx = x0 + slot * (i + 0.5)
-        bh = max(2, (bottom - top - 16) * n / peak)
-        out.append(bar(cx - bw / 2, bottom - bh, bw, bh, 4, t["accent"]))
-        out.append(text(cx, bottom - bh - 6, n, 12, t["text"], 600, "middle"))
-        out.append(text(cx, bottom + 18, rating, 11, t["muted"], anchor="middle"))
+        bh = max(2, (bottom - top - 14) * n / peak)
+        col = spectrum(c["spectrum"], i / max(len(buckets) - 1, 1))
+        out.append(bar(cx - bw / 2, bottom - bh, bw, bh, 5, col))
+        out.append(ty.text(cx, bottom - bh - 7, str(n), "mono", 10.5, c["ink"], anchor="middle"))
+        out.append(ty.text(cx, bottom + 17, str(rating), "mono", 9, c["muted"], anchor="middle"))
     return out
 
 
-def tags_line(d, t):
+def tags_block(d, c, ty, x, y, width):
     if not d["tags"]:
-        return []
-    parts = [f'<tspan fill="{t["muted"]}">Tags mais resolvidas:  </tspan>']
-    for i, (tag, n) in enumerate(d["tags"]):
-        sep = f'<tspan fill="{t["muted"]}">  ·  </tspan>' if i else ""
-        parts.append(f'{sep}<tspan fill="{t["text"]}">{escape(tag)}</tspan>'
-                     f'<tspan fill="{t["muted"]}"> {n}</tspan>')
-    return [f'<text x="{PAD}" y="{H - 24}" font-family="{FONT}" font-size="13">{"".join(parts)}</text>']
+        return [], y
+    out = [ty.text(x, y, "TAGS MAIS RESOLVIDAS", "mono", 9, c["muted"], tracking=0.16)]
+    cx, cy = x, y + 26
+    for tag, n in d["tags"]:
+        tag_w = ty.width(tag, "sans", 14)
+        count_w = ty.width(str(n), "mono", 10)
+        if cx + tag_w + count_w + 6 > x + width:
+            cx, cy = x, cy + 24
+        out.append(ty.text(cx, cy, tag, "sans", 14, c["text"]))
+        out.append(ty.text(cx + tag_w + 6, cy, str(n), "mono", 10, c["muted"]))
+        cx += tag_w + count_w + 26
+    return out, cy
 
 
-def render(d, theme):
-    t = THEMES[theme]
+def render(d, theme, kind):
+    c, L, ty = THEMES[theme], LAYOUTS[kind], Type()
+    W, pad = L["W"], L["pad"]
+    stat_y, row_h = L["stat_y"]
+    rows = math.ceil(4 / L["stat_cols"])
+    body = [header(d, c, ty, theme, pad, W - pad)]
+    body += stats(d, c, ty, pad, W - 2 * pad, L["stat_cols"], stat_y, row_h)
+    rule_y = stat_y + (rows - 1) * row_h + 56
+    body.append(f'<rect x="{pad}" y="{rule_y}" width="{W - 2 * pad}" height="1" fill="{c["grid"]}"/>')
+
+    y, ch = L["charts_y"], L["chart_h"]
+    if L["side_by_side"]:
+        half = (W - 2 * pad - 60) / 2
+        body += rating_chart(d, c, ty, pad, y, half, ch)
+        body += difficulty_chart(d, c, ty, pad + half + 60, y, half, ch)
+        y += ch + 36
+    else:
+        body += rating_chart(d, c, ty, pad, y, W - 2 * pad, ch)
+        y += ch + 40
+        body += difficulty_chart(d, c, ty, pad, y, W - 2 * pad, ch)
+        y += ch + 36
+    tags, y = tags_block(d, c, ty, pad, y, W - 2 * pad)
+    body += tags
+    H = math.ceil(y + 34)
+
+    stops = c["spectrum"]
+    defs = (ty.defs()
+            + f'<linearGradient id="stroke" gradientUnits="userSpaceOnUse" x1="{pad}" x2="{pad + (W - 2 * pad) / (2 if L["side_by_side"] else 1)}">{gradient_stops(stops)}</linearGradient>'
+            + f'<linearGradient id="area" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="{spectrum(stops, .4)}" stop-opacity=".22"/>'
+              f'<stop offset="1" stop-color="{spectrum(stops, .4)}" stop-opacity="0"/></linearGradient>')
     desc = (f'{d["handle"]} no Codeforces: rating {d["rating"]} ({d["rank"]}), máximo {d["max_rating"]}, '
             f'{d["solved"]} problemas resolvidos em {len(d["history"])} contests.')
-    body = [
-        f'<rect x="0.5" y="0.5" width="{W - 1}" height="{H - 1}" rx="12" fill="{t["surface"]}" stroke="{t["border"]}"/>',
-        text(PAD, 42, "Codeforces", 15, t["text"], 600),
-        text(W - PAD, 42, d["handle"], 13, t["muted"], anchor="end", family=MONO),
-        *rank_chip(d, t, theme),
-        *stat_tiles(d, t),
-        f'<line x1="{PAD}" x2="{W - PAD}" y1="150" y2="150" stroke="{t["border"]}" stroke-width="1"/>',
-        *rating_chart(d, t, PAD, 180, 380, 134),
-        *difficulty_chart(d, t, 448, 180, W - 448 - PAD, 134),
-        *tags_line(d, t),
-    ]
-    return (f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" '
-            f'role="img" aria-labelledby="t d"><title id="t">Estatísticas no Codeforces</title>'
-            f'<desc id="d">{escape(desc)}</desc>' + "".join(body) + "</svg>\n")
+    return card(W, H, c, "".join(body), title="Estatísticas no Codeforces", desc=desc, defs=defs, theme=theme)
 
 
 def main():
     handle = sys.argv[1] if len(sys.argv) > 1 else "root.svp"
     data = collect(handle)
-    OUT.mkdir(exist_ok=True)
+    ASSETS.mkdir(exist_ok=True)
     for theme in THEMES:
-        (OUT / f"codeforces-{theme}.svg").write_text(render(data, theme), encoding="utf-8")
+        for kind in LAYOUTS:
+            name = f"codeforces-{theme}" if kind == "desktop" else f"codeforces-mobile-{theme}"
+            (ASSETS / f"{name}.svg").write_text(render(data, theme, kind), encoding="utf-8")
     print(f'{data["handle"]}: {data["rating"]} ({data["rank"]}), {data["solved"]} resolvidos')
 
 

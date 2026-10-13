@@ -10,9 +10,15 @@ permissions:
 
 jobs:
   atualizar:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+
+      - name: Instalar fontes e fontTools
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q --no-install-recommends \
+            fonts-ebgaramond-extra fonts-inter fonts-jetbrains-mono python3-fonttools
 
       - name: Gerar card
         run: python3 scripts/codeforces_card.py root.svp
