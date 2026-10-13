@@ -15,7 +15,7 @@ import urllib.request
 from collections import Counter
 from datetime import datetime, timezone
 
-from design import ASSETS, THEMES, Type, card, gradient_stops, spectrum
+from design import ASSETS, THEMES, Type, mix, svg
 
 API = "https://codeforces.com/api/"
 
@@ -33,8 +33,8 @@ RANK_COLORS = {
 }
 
 LAYOUTS = {
-    "desktop": dict(W=1000, pad=36, stat_cols=4, stat_y=(142, 62), charts_y=218, chart_h=112, side_by_side=True),
-    "mobile": dict(W=480, pad=24, stat_cols=2, stat_y=(138, 74), charts_y=290, chart_h=120, side_by_side=False),
+    "desktop": dict(W=1000, pad=2, stat_cols=4, stat_y=(104, 62), charts_y=178, chart_h=112, side_by_side=True),
+    "mobile": dict(W=480, pad=2, stat_cols=2, stat_y=(100, 66), charts_y=240, chart_h=120, side_by_side=False),
 }
 
 
@@ -80,14 +80,10 @@ def collect(handle):
 
 def header(d, c, ty, theme, x, right):
     rank_color = RANK_COLORS.get(d["rank"], ("#808080", "#9198a1"))[0 if theme == "light" else 1]
-    rank = d["rank"].upper()
-    rank_w = ty.width(rank, "mono", 9.5, 0.16)
-    chip_x = right - rank_w - 34
-    return (ty.text(x, 46, "CODEFORCES", "mono", 9, c["muted"], tracking=0.16)
-            + ty.text(x - 1, 74, d["handle"], "italic", 24, c["ink"])
-            + f'<rect x="{chip_x:.1f}" y="38.5" width="{rank_w + 34:.1f}" height="24" rx="12" fill="none" stroke="{c["border"]}"/>'
-            + f'<circle cx="{chip_x + 14:.1f}" cy="50.5" r="3.2" fill="{rank_color}"/>'
-            + ty.text(chip_x + 24, 54, rank, "mono", 9, c["text"], tracking=0.16))
+    rank_w = ty.width(d["rank"], "italic", 16)
+    return (ty.text(x - 1, 40, d["handle"], "italic", 22, c["ink"])
+            + f'<circle cx="{right - rank_w - 10:.1f}" cy="34.5" r="3" fill="{rank_color}"/>'
+            + ty.text(right, 40, d["rank"], "italic", 16, c["muted"], anchor="end"))
 
 
 def stats(d, c, ty, x0, width, cols, y, row_h):
@@ -98,14 +94,13 @@ def stats(d, c, ty, x0, width, cols, y, row_h):
     for i, (label, value) in enumerate(items):
         x = x0 + (i % cols) * col
         yy = y + (i // cols) * row_h
-        out.append(ty.text(x - 1.5, yy, str(value), "serif", 42, c["ink"], features=("lnum",)))
-        out.append(f'<rect x="{x:.1f}" y="{yy + 11}" width="16" height="1.4" fill="{spectrum(c["spectrum"], i / 3)}"/>')
-        out.append(ty.text(x, yy + 28, label, "mono", 8.5, c["muted"], tracking=0.16))
+        out.append(ty.text(x - 1.5, yy, str(value), "serif", 38, c["ink"], features=("lnum",)))
+        out.append(ty.text(x, yy + 22, label, "mono", 8.5, c["muted"], tracking=0.14))
     return out
 
 
 def rating_chart(d, c, ty, x0, y0, w, h):
-    out = [ty.text(x0, y0, "RATING POR CONTEST", "mono", 9, c["muted"], tracking=0.16)]
+    out = [ty.text(x0, y0, "RATING POR CONTEST", "mono", 8.5, c["muted"], tracking=0.14)]
     pts = d["history"]
     if not pts:
         return out + [ty.text(x0, y0 + h / 2, "sem contests ainda", "italic", 15, c["muted"])]
@@ -124,67 +119,57 @@ def rating_chart(d, c, ty, x0, y0, w, h):
         return bottom - (bottom - top) * (r - lo) / (hi - lo)
 
     for v in (lo, lo + step, hi):
-        out.append(f'<path d="M{left},{sy(v):.1f}H{right}" stroke="{c["grid"]}" stroke-dasharray="2 4"/>')
-        out.append(ty.text(left - 10, sy(v) + 3.5, str(v), "mono", 9, c["muted"], anchor="end"))
+        out.append(f'<path d="M{left},{sy(v):.1f}H{right}" stroke="{c["line"]}" stroke-dasharray="1 4"/>')
+        out.append(ty.text(left - 10, sy(v) + 3.5, str(v), "mono", 8.5, c["muted"], anchor="end"))
 
     xy = [(sx(ts), sy(r)) for ts, r in pts]
     line = " ".join(f"{x:.1f},{y:.1f}" for x, y in xy)
-    area = f"M{xy[0][0]:.1f},{bottom}L{line.replace(' ', 'L')}L{xy[-1][0]:.1f},{bottom}Z"
-    out.append(f'<path d="{area}" fill="url(#area)"/>')
-    out.append(f'<polyline points="{line}" fill="none" stroke="url(#stroke)" stroke-width="2" '
+    out.append(f'<polyline points="{line}" fill="none" stroke="{c["ink"]}" stroke-width="1.3" '
                f'stroke-linejoin="round" stroke-linecap="round"/>')
-    for i, (x, y) in enumerate(xy):
-        col = spectrum(c["spectrum"], (x - left) / max(right - left, 1))
-        out.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="4" fill="{c["bg"]}" stroke="{col}" stroke-width="2"/>')
-    out.append(ty.text(xy[-1][0] + 10, xy[-1][1] + 4, str(pts[-1][1]), "mono", 11, c["ink"]))
+    for x, y in xy:
+        out.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="2.6" fill="{c["page"]}" stroke="{c["ink"]}" stroke-width="1.2"/>')
+    out.append(ty.text(xy[-1][0] + 9, xy[-1][1] + 4, str(pts[-1][1]), "mono", 10, c["ink"]))
 
     fmt = lambda ts: datetime.fromtimestamp(ts, timezone.utc).strftime("%d/%m/%y")
-    out.append(ty.text(left, bottom + 18, fmt(t0), "mono", 9, c["muted"]))
+    out.append(ty.text(left, bottom + 18, fmt(t0), "mono", 8.5, c["muted"]))
     if t1 > t0:
-        out.append(ty.text(right, bottom + 18, fmt(t1), "mono", 9, c["muted"], anchor="end"))
+        out.append(ty.text(right, bottom + 18, fmt(t1), "mono", 8.5, c["muted"], anchor="end"))
     return out
 
 
-def bar(x, y, w, h, r, fill):
-    """Barra com só os cantos de cima arredondados, presa na linha de base."""
-    r = min(r, w / 2, h)
-    return (f'<path d="M{x:.1f},{y + h:.1f} V{y + r:.1f} Q{x:.1f},{y:.1f} {x + r:.1f},{y:.1f} '
-            f'H{x + w - r:.1f} Q{x + w:.1f},{y:.1f} {x + w:.1f},{y + r:.1f} V{y + h:.1f} Z" fill="{fill}"/>')
-
-
 def difficulty_chart(d, c, ty, x0, y0, w, h):
-    out = [ty.text(x0, y0, "RESOLVIDOS POR DIFICULDADE", "mono", 9, c["muted"], tracking=0.16)]
+    out = [ty.text(x0, y0, "RESOLVIDOS POR DIFICULDADE", "mono", 8.5, c["muted"], tracking=0.14)]
     buckets = d["by_rating"]
     if not buckets:
         return out
     top, bottom = y0 + 30, y0 + h - 22
     peak = max(n for _, n in buckets)
     slot = w / len(buckets)
-    bw = min(44, slot * 0.58)
-    out.append(f'<rect x="{x0}" y="{bottom}" width="{w}" height="1" fill="{c["axis"]}"/>')
+    bw = min(34, slot * 0.46)
+    out.append(f'<rect x="{x0}" y="{bottom}" width="{w}" height="1" fill="{c["line"]}"/>')
     for i, (rating, n) in enumerate(buckets):
         cx = x0 + slot * (i + 0.5)
         bh = max(2, (bottom - top - 14) * n / peak)
-        col = spectrum(c["spectrum"], i / max(len(buckets) - 1, 1))
-        out.append(bar(cx - bw / 2, bottom - bh, bw, bh, 5, col))
-        out.append(ty.text(cx, bottom - bh - 7, str(n), "mono", 10.5, c["ink"], anchor="middle"))
-        out.append(ty.text(cx, bottom + 17, str(rating), "mono", 9, c["muted"], anchor="middle"))
+        out.append(f'<rect x="{cx - bw / 2:.1f}" y="{bottom - bh:.1f}" width="{bw:.1f}" height="{bh:.1f}" '
+                   f'fill="{mix(c["ink"], c["page"], 0.62)}"/>')
+        out.append(ty.text(cx, bottom - bh - 7, str(n), "mono", 10, c["ink"], anchor="middle"))
+        out.append(ty.text(cx, bottom + 17, str(rating), "mono", 8.5, c["muted"], anchor="middle"))
     return out
 
 
 def tags_block(d, c, ty, x, y, width):
     if not d["tags"]:
         return [], y
-    out = [ty.text(x, y, "TAGS MAIS RESOLVIDAS", "mono", 9, c["muted"], tracking=0.16)]
+    out = [ty.text(x, y, "TAGS MAIS RESOLVIDAS", "mono", 8.5, c["muted"], tracking=0.14)]
     cx, cy = x, y + 24
     for tag, n in d["tags"]:
-        tag_w = ty.width(tag, "sans", 13)
-        count_w = ty.width(str(n), "mono", 10)
+        tag_w = ty.width(tag, "italic", 15)
+        count_w = ty.width(str(n), "mono", 9.5)
         if cx + tag_w + count_w + 6 > x + width:
             cx, cy = x, cy + 22
-        out.append(ty.text(cx, cy, tag, "sans", 13, c["text"]))
-        out.append(ty.text(cx + tag_w + 6, cy, str(n), "mono", 10, c["muted"]))
-        cx += tag_w + count_w + 26
+        out.append(ty.text(cx, cy, tag, "italic", 15, c["ink"]))
+        out.append(ty.text(cx + tag_w + 5, cy, str(n), "mono", 9.5, c["muted"]))
+        cx += tag_w + count_w + 24
     return out, cy
 
 
@@ -195,8 +180,8 @@ def render(d, theme, kind):
     rows = math.ceil(4 / L["stat_cols"])
     body = [header(d, c, ty, theme, pad, W - pad)]
     body += stats(d, c, ty, pad, W - 2 * pad, L["stat_cols"], stat_y, row_h)
-    rule_y = stat_y + (rows - 1) * row_h + 46
-    body.append(f'<rect x="{pad}" y="{rule_y}" width="{W - 2 * pad}" height="1" fill="{c["grid"]}"/>')
+    rule_y = stat_y + (rows - 1) * row_h + 44
+    body.append(f'<rect x="{pad}" y="{rule_y}" width="{W - 2 * pad}" height="1" fill="{c["line"]}"/>')
 
     y, ch = L["charts_y"], L["chart_h"]
     if L["side_by_side"]:
@@ -211,16 +196,10 @@ def render(d, theme, kind):
         y += ch + 30
     tags, y = tags_block(d, c, ty, pad, y, W - 2 * pad)
     body += tags
-    H = math.ceil(y + 28)
-
-    stops = c["spectrum"]
-    defs = (ty.defs()
-            + f'<linearGradient id="stroke" gradientUnits="userSpaceOnUse" x1="{pad}" x2="{pad + (W - 2 * pad) / (2 if L["side_by_side"] else 1)}">{gradient_stops(stops)}</linearGradient>'
-            + f'<linearGradient id="area" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="{spectrum(stops, .4)}" stop-opacity=".22"/>'
-              f'<stop offset="1" stop-color="{spectrum(stops, .4)}" stop-opacity="0"/></linearGradient>')
+    H = math.ceil(y + 16)
     desc = (f'{d["handle"]} no Codeforces: rating {d["rating"]} ({d["rank"]}), máximo {d["max_rating"]}, '
             f'{d["solved"]} problemas resolvidos em {len(d["history"])} contests.')
-    return card(W, H, c, "".join(body), title="Estatísticas no Codeforces", desc=desc, defs=defs, rx=16, theme=theme)
+    return svg(W, H, "".join(body), title="Estatísticas no Codeforces", desc=desc, defs=ty.defs())
 
 
 def main():
