@@ -27,9 +27,10 @@ THEMES = {
     "light": dict(bg="#f6f8fa", text="#24292f", key="#953800", value="#0a3069", dots="#c2cfde", prompt="#116329"),
 }
 
-# art: colunas do desenho (0 = desenho em cima do texto); columns: larguras das colunas de texto
+# desktop: desenho numa faixa à esquerda com a altura toda e o terminal ao lado, para o cartão ficar baixo;
+# celular: desenho em cima do texto. columns: larguras das colunas de informação, em caracteres.
 LAYOUTS = {
-    "desktop": dict(size=11, lead=15, pad=16, art=18, gap=4, columns=(46, 46), col_gap=5),
+    "desktop": dict(size=11, lead=15, pad=14, art=18, gap=4, columns=(46, 46), col_gap=6),
     "mobile": dict(size=11, lead=15, pad=12, art=0, gap=0, columns=(44,), col_gap=0, art_mobile=24),
 }
 
@@ -110,7 +111,7 @@ def section(title, width):
 
 
 def columns(solved, widths):
-    """As informações, em uma coluna (celular) ou duas (desktop, para o cartão ficar baixo)."""
+    """As informações, em uma coluna (celular) ou duas lado a lado (desktop, para o cartão ficar baixo)."""
     header = [("luiz", "value"), ("@", "text"), ("felipe", "value")]
     if len(widths) == 1:
         (w,) = widths
@@ -120,7 +121,6 @@ def columns(solved, widths):
             kv("Pesquisa", "IC em modelagem, EDPs", w),
             kv("Linguagens", "C, C++, Python, LaTeX", w),
             kv("Matemática", "análise real, medida", w),
-            kv("Interesses", "arquitetura, concorrência", w),
             section("Projetos", w),
             kv("atlas-pdf", "PDFs por conteúdo", w),
             kv("modelagem", "caos e ajuste de modelos", w),
@@ -135,7 +135,6 @@ def columns(solved, widths):
             kv("Pesquisa", "IC: controle populacional, EDPs", left),
             kv("Linguagens", "C, C++, Python, LaTeX", left),
             kv("Matemática", "análise real, espaços métricos", left),
-            kv("Interesses", "arquitetura de computadores", left),
         ],
         [
             section("Projetos", right),
@@ -158,10 +157,11 @@ def render(solved, theme, kind):
     c, L, ty = THEMES[theme], LAYOUTS[kind], Type()
     size, lead, pad = L["size"], L["lead"], L["pad"]
     cw = size * 0.6  # a JetBrains Mono tem avanço de 600/1000 em todos os glifos
-    bar = 24
-    text_cols = sum(L["columns"]) + L["col_gap"] * (len(L["columns"]) - 1)
-    W = math.ceil(pad * 2 + (L["art"] + L["gap"] + text_cols) * cw)
-    top = bar + 6
+    side = bool(L["art"])  # desktop: desenho numa faixa lateral
+    info_cols = sum(L["columns"]) + L["col_gap"] * (len(L["columns"]) - 1)
+    term = L["art"] + L["gap"] if side else 0  # coluna onde começa o terminal
+    W = math.ceil(pad * 2 + (term + info_cols) * cw)
+    top = pad * 0.55
 
     def x_of(col):
         return pad + col * cw
@@ -177,47 +177,54 @@ def render(solved, theme, kind):
         return "".join(out)
 
     info = columns(solved, L["columns"])
-    art_cols = L["art"] or L["art_mobile"]
-    art_col = 0 if L["art"] else (text_cols - art_cols) / 2
-    first = 1  # linha 0: prompt com o comando
-    art, art_rows, origin = braille(x_of(art_col), top + first * lead, art_cols, cw, lead)
     tallest = max(len(col) for col in info)
-    if L["art"]:
-        info_row = first + max(0, (art_rows - tallest) // 2)
-        last = max(first + art_rows, info_row + tallest) - 1
+    art_cols = L["art"] or L["art_mobile"]
+    if side:
+        info_row, art_row, art_col = 1, 0, 0
+        art, art_rows, origin = braille(x_of(0), top, art_cols, cw, lead)
+        final_row = max(info_row + tallest, art_rows - 1)
     else:
-        info_row = first + art_rows + 1
-        last = info_row + tallest - 1
-    final_row = last + 1
-    H = math.ceil(y_of(final_row) + lead * 0.28 + pad * 0.7)
+        art_row, art_col = 1, (info_cols - art_cols) / 2
+        art, art_rows, origin = braille(x_of(art_col), top + lead, art_cols, cw, lead)
+        info_row = 1 + art_rows + 1
+        final_row = info_row + tallest
+    H = math.ceil(y_of(final_row) + lead * 0.28 + pad * 0.55)
 
     # 1) prompt e o comando digitado letra a letra
-    out = [write(0, 0, [(PROMPT, "prompt")])]
+    prompt_col = term
+    out = [write(prompt_col, 0, [(PROMPT, "prompt")])]
     for k, ch in enumerate(COMMAND):
-        out.append(at(TYPE_START + k * TYPE_STEP, write(len(PROMPT) + k, 0, [(ch, "text")])))
+        out.append(at(TYPE_START + k * TYPE_STEP, write(prompt_col + len(PROMPT) + k, 0, [(ch, "text")])))
     typed = TYPE_START + len(COMMAND) * TYPE_STEP
     start = typed + PRINT_GAP
 
-    # 2) a saída, linha a linha: desenho e informações saem juntos em cada linha
-    delay = lambda row: start + (row - first) * LINE_STEP
+    # 2) a saída, linha a linha; no desktop o desenho se imprime junto, de cima para baixo
+    delay = lambda row: start + (row - 1) * LINE_STEP
     for r in range(art_rows):
         if r in art:
-            out.append(at(delay(first + r), f'<path d="{art[r]}" stroke="{c["text"]}" stroke-width="1.4" stroke-linecap="round"/>'))
-    out.append(at(delay(first + art_rows // 2),
+            out.append(at(delay(art_row + r) if not side else start + r * LINE_STEP,
+                          f'<path d="{art[r]}" stroke="{c["text"]}" stroke-width="1.4" stroke-linecap="round"/>'))
+    out.append(at(start + art_rows // 2 * LINE_STEP,
                   f'<circle cx="{origin[0]:.1f}" cy="{origin[1]:.1f}" r="2.5" fill="none" stroke="{c["key"]}" stroke-width="1"/>'))
-    col = L["art"] + L["gap"]
+    col = term
     for width, rows in zip(L["columns"], info):
         for k, segments in enumerate(rows):
             out.append(at(delay(info_row + k), write(col, info_row + k, segments)))
         col += width + L["col_gap"]
 
-    # 3) prompt novo, com o cursor piscando
-    end = delay(last) + 0.25
-    cursor = (f'<rect class="blink" x="{x_of(len(PROMPT)):.1f}" y="{y_of(final_row) - size * 0.8:.1f}" '
+    # 3) prompt novo, com o cursor piscando, e a legenda da curva no canto
+    end = max(delay(final_row - 1), start + art_rows * LINE_STEP) + 0.25
+    cursor = (f'<rect class="blink" x="{x_of(prompt_col + len(PROMPT)):.1f}" y="{y_of(final_row) - size * 0.8:.1f}" '
               f'width="{cw:.1f}" height="{size:.1f}" fill="{c["text"]}" style="animation-delay:{end:.2f}s"/>')
-    out.append(at(end, write(0, final_row, [(PROMPT, "prompt")]) + cursor))
+    caption = "ζ(½ + it), 0 ≤ t ≤ 50"
+    caption_svg = (ty.text(x_of(term + info_cols), y_of(final_row), caption, "mono", size * 0.9, c["dots"], anchor="end")
+                   if side else ty.text(x_of(art_col + art_cols / 2), y_of(art_row + art_rows), caption, "mono",
+                                        size * 0.9, c["dots"], anchor="middle"))
+    out.append(at(end, write(prompt_col, final_row, [(PROMPT, "prompt")]) + cursor + (caption_svg if side else "")))
+    if not side:
+        out.append(at(delay(art_row + art_rows), caption_svg))
     # cursor do primeiro prompt: anda enquanto o comando é digitado e some no Enter
-    out.append(f'<rect class="typing" x="{x_of(len(PROMPT)):.1f}" y="{y_of(0) - size * 0.8:.1f}" '
+    out.append(f'<rect class="typing" x="{x_of(prompt_col + len(PROMPT)):.1f}" y="{y_of(0) - size * 0.8:.1f}" '
                f'width="{cw:.1f}" height="{size:.1f}" fill="{c["text"]}"/>')
 
     span = start
@@ -230,21 +237,15 @@ def render(solved, theme, kind):
            f"{(typed + 0.01) / span * 100:.1f}%,100%{{transform:translateX({len(COMMAND) * cw:.1f}px);opacity:0}}}}"
            "@media (prefers-reduced-motion:reduce){.p,.blink{animation:none}.typing{display:none}}")
 
-    dots_bar = "".join(f'<circle cx="{pad + 4 + i * 14}" cy="{bar / 2 + 1}" r="4" fill="{c["dots"]}"/>' for i in range(3))
-    bar_text = (ty.text(W / 2, bar / 2 + 4.5, "luiz@felipe: ~", "mono", size * 0.9, c["dots"], anchor="middle")
-                + (ty.text(W - pad, bar / 2 + 4.5, "ζ(½ + it), 0 ≤ t ≤ 50", "mono", size * 0.9, c["dots"], anchor="end")
-                   if L["art"] else ""))
-    desc = (f"Terminal em que o comando neofetch é digitado e a saída aparece linha a linha. À esquerda, a curva da "
-            f"função zeta de Riemann ζ(½ + it), para 0 ≤ t ≤ 50, em pontos braille. Ao lado: Ciência da Computação "
+    desc = (f"Terminal em que o comando neofetch é digitado e a saída aparece linha a linha. Ao lado, a curva da "
+            f"função zeta de Riemann ζ(½ + it), para 0 ≤ t ≤ 50, em pontos braille. Na saída: Ciência da Computação "
             f"na UFPel; iniciação científica em modelagem matemática (controle populacional e EDPs); C, C++, Python e "
             f"LaTeX; análise real; projetos atlas-pdf e modelagem; {solved} problemas resolvidos no Codeforces como "
             f"{CODEFORCES_USER}.")
     return (f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" '
             f'role="img" aria-labelledby="t d">\n<title id="t">luiz@felipe</title>\n<desc id="d">{desc}</desc>\n'
             f"<style>{css}</style>\n<defs>{ty.defs()}</defs>\n"
-            f'<rect width="{W}" height="{H}" rx="12" fill="{c["bg"]}"/>\n'
-            f'{dots_bar}{bar_text}<rect x="0" y="{bar + 2}" width="{W}" height="1" fill="{c["dots"]}" opacity=".35"/>\n'
-            f'{"".join(out)}\n</svg>\n')
+            f'<rect width="{W}" height="{H}" rx="10" fill="{c["bg"]}"/>\n{"".join(out)}\n</svg>\n')
 
 
 def main():
