@@ -1,56 +1,19 @@
-"""Base visual do perfil: paleta e tipografia em contornos.
+"""Tipografia em contornos para os SVGs do perfil.
 
-Os textos viram contornos (<path>) tirados das próprias fontes com o fontTools,
+Os textos viram contornos (<path>) tirados da própria fonte com o fontTools,
 então os SVGs ficam idênticos em qualquer navegador, sem depender de fontes
 instaladas. Cada glifo é desenhado uma vez em <defs> e reaproveitado com <use>.
 
-Os SVGs têm fundo transparente e usam as cores de texto do GitHub, para se
-assentarem na página como parte do README. A tipografia precisa do fontTools
-(pip install fonttools) e das fontes EB Garamond, Inter e JetBrains Mono,
-todas sob a licença OFL.
+Precisa do fontTools e da JetBrains Mono (licença OFL); no Ubuntu,
+`apt install python3-fonttools fonts-jetbrains-mono`.
 """
 
-from html import escape
 from pathlib import Path
 
 ASSETS = Path(__file__).resolve().parent.parent / "assets"
 
-THEMES = {
-    "light": dict(page="#ffffff", ink="#1f2328", muted="#59636e", line="#d1d9e0", faint="#eef1f4"),
-    "dark": dict(page="#0d1117", ink="#f0f6fc", muted="#9198a1", line="#3d444d", faint="#1c222b"),
-}
-
-FONT_FILES = {
-    "serif": "EBGaramond12-Regular.ttf",
-    "italic": "EBGaramond12-Italic.ttf",
-    "sans": "Inter-Regular.otf",
-    "mono": "JetBrainsMono-Regular.ttf",
-}
+FONT_FILES = {"mono": "JetBrainsMono-Regular.ttf"}
 FONT_DIRS = ("/usr/share/fonts", "/usr/local/share/fonts", "~/.local/share/fonts", "~/.fonts")
-
-
-def mix(a, b, u):
-    """Cor sólida entre a e b; evita transparência, que escurece onde traços se cruzam."""
-    ca = [int(a[i:i + 2], 16) for i in (1, 3, 5)]
-    cb = [int(b[i:i + 2], 16) for i in (1, 3, 5)]
-    return "#" + "".join(f"{round(x + (y - x) * u):02x}" for x, y in zip(ca, cb))
-
-
-def path_d(pts):
-    """Polilinha em coordenadas relativas, arredondada a 0,1 px sem acumular erro."""
-    pts = [(round(x, 1), round(y, 1)) for x, y in pts]
-    steps = (f"{round(x1 - x0, 1):g},{round(y1 - y0, 1):g}" for (x0, y0), (x1, y1) in zip(pts, pts[1:]))
-    return f"M{pts[0][0]:g},{pts[0][1]:g}l" + " ".join(steps)
-
-
-def svg(W, H, body, *, title, desc="", defs="", css=""):
-    """Documento SVG transparente com título e descrição acessíveis."""
-    labels = "t d" if desc else "t"
-    return (f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" '
-            f'role="img" aria-labelledby="{labels}">\n<title id="t">{escape(title)}</title>\n'
-            + (f'<desc id="d">{escape(desc)}</desc>\n' if desc else "")
-            + (f"<style>{css}</style>\n" if css else "")
-            + f"<defs>{defs}</defs>\n{body}\n</svg>\n")
 
 
 def find_font(name):
