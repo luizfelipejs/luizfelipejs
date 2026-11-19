@@ -1,10 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="820" height="270" viewBox="0 0 820 270"
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="286" viewBox="0 0 820 286"
      role="img" aria-labelledby="title description">
-  <title id="title">Oficina de código</title>
-  <desc id="description">Um ferreiro em pixel art martela uma peça numa oficina à noite. A cada batida, faíscas iluminam a bigorna e um símbolo de código sai da peça.</desc>
+  <title id="title">Luiz Felipe · Ciência da Computação na UFPel</title>
+  <desc id="description">Um ferreiro em pixel art martela uma peça numa oficina à noite. A cada batida saem faíscas e um símbolo de código, e o brilho percorre o nome Luiz Felipe.</desc>
 
   <defs>
-    <clipPath id="frame"><rect x="1" y="1" width="818" height="268" rx="16"/></clipPath>
+    <clipPath id="frame"><rect x="1" y="1" width="818" height="284" rx="16"/></clipPath>
     <clipPath id="window"><path d="M601 62h151v94H601z"/></clipPath>
     <linearGradient id="room" x2="0" y2="1">
       <stop stop-color="#141a27"/>
@@ -34,6 +34,20 @@
     <pattern id="floorboards" width="80" height="24" patternUnits="userSpaceOnUse">
       <path d="M0 0h80M0 12h80M15 0v12M51 12v12" fill="none" stroke="#997674" stroke-opacity=".19"/>
     </pattern>
+    <linearGradient id="wall-shade">
+      <stop stop-color="#10141e" stop-opacity=".84"/>
+      <stop offset=".68" stop-color="#10141e" stop-opacity=".82"/>
+      <stop offset="1" stop-color="#10141e" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="letter-glint">
+      <stop stop-color="#a8f8dd" stop-opacity="0"/>
+      <stop offset=".5" stop-color="#c7ffeb"/>
+      <stop offset="1" stop-color="#a8f8dd" stop-opacity="0"/>
+    </linearGradient>
+    <text id="profile-name" x="48" y="129" font-size="62" font-weight="780"
+          font-family="system-ui, -apple-system, sans-serif" letter-spacing="-2.8"
+          textLength="286" lengthAdjust="spacingAndGlyphs">Luiz Felipe</text>
+    <clipPath id="name-silhouette"><use href="#profile-name"/></clipPath>
     <path id="code-mark" d="M-13-4l-5 4 5 4m15-10-4 12m11-10 5 4-5 4" fill="none"
           stroke-linecap="square" stroke-linejoin="miter"/>
   </defs>
@@ -84,94 +98,166 @@
       70% { fill: #9ffbe2; }
     }
 
-    #smith-swing {
+    .signature-glint {
+      opacity: 0;
+      animation: illuminate-name var(--cycle) linear infinite;
+    }
+    .signature-line {
+      stroke-dasharray: 61 250;
+      stroke-dashoffset: 61;
+      opacity: 0;
+      animation: conduct var(--cycle) linear infinite;
+    }
+    @keyframes illuminate-name {
+      0%, 50% { opacity: 0; transform: translateX(0); }
+      54% { opacity: .85; }
+      64% { opacity: .85; }
+      76%, 100% { opacity: 0; transform: translateX(-352px); }
+    }
+    @keyframes conduct {
+      0%, 48% { stroke-dashoffset: 61; opacity: 0; }
+      51% { opacity: .95; }
+      66% { opacity: .95; }
+      73%, 100% { stroke-dashoffset: -250; opacity: 0; }
+    }
+
+    #smith-upper-arm {
       transform-origin: 0 0;
-      transform: rotate(-59deg);
-      animation: smith-strike var(--cycle) infinite;
+      transform: rotate(15deg);
+      animation: smith-upper-arm-motion var(--cycle) infinite;
+    }
+    @keyframes smith-upper-arm-motion {
+      0% { transform: rotate(15deg); animation-timing-function: ease-in-out; }
+      24% { transform: rotate(-12deg); animation-timing-function: ease-out; }
+      35% { transform: rotate(-27deg); animation-timing-function: ease-in; }
+      41% { transform: rotate(-5deg); animation-timing-function: linear; }
+      45% { transform: rotate(17deg); animation-timing-function: ease-in; }
+      48% { transform: rotate(28deg); animation-timing-function: ease-out; }
+      53% { transform: rotate(29deg); animation-timing-function: ease-in-out; }
+      60% { transform: rotate(30deg); animation-timing-function: ease-in-out; }
+      73% { transform: rotate(24deg); animation-timing-function: ease-in-out; }
+      90%, 100% { transform: rotate(15deg); }
+    }
+    #smith-forearm {
+      transform-origin: 0 0;
+      transform: rotate(-73deg);
+      animation: smith-forearm-motion var(--cycle) infinite;
+    }
+    @keyframes smith-forearm-motion {
+      0% { transform: rotate(-73deg); animation-timing-function: ease-in-out; }
+      24% { transform: rotate(-67deg); animation-timing-function: ease-out; }
+      35% { transform: rotate(-61deg); animation-timing-function: ease-in; }
+      41% { transform: rotate(-72deg); animation-timing-function: linear; }
+      45% { transform: rotate(-72deg); animation-timing-function: ease-in; }
+      48% { transform: rotate(-51deg); animation-timing-function: ease-out; }
+      53% { transform: rotate(-62deg); animation-timing-function: ease-in-out; }
+      60% { transform: rotate(-60deg); animation-timing-function: ease-in-out; }
+      73% { transform: rotate(-68deg); animation-timing-function: ease-in-out; }
+      90%, 100% { transform: rotate(-73deg); }
+    }
+    #smith-wrist {
+      transform-origin: 0 0;
+      transform: rotate(-4deg);
+      animation: smith-wrist-motion var(--cycle) infinite;
+    }
+    @keyframes smith-wrist-motion {
+      0% { transform: rotate(-4deg); animation-timing-function: ease-in-out; }
+      24% { transform: rotate(-5deg); animation-timing-function: ease-out; }
+      35% { transform: rotate(-18deg); animation-timing-function: ease-in; }
+      41% { transform: rotate(-20deg); animation-timing-function: linear; }
+      45% { transform: rotate(-8deg); animation-timing-function: ease-in; }
+      48% { transform: rotate(23deg); animation-timing-function: ease-out; }
+      53% { transform: rotate(18deg); animation-timing-function: ease-in-out; }
+      60% { transform: rotate(18deg); animation-timing-function: ease-in-out; }
+      73% { transform: rotate(7deg); animation-timing-function: ease-in-out; }
+      90%, 100% { transform: rotate(-4deg); }
     }
     #smith-torso {
-      transform-origin: 381px 181px;
-      animation: smith-brace var(--cycle) infinite;
+      transform-origin: 0 0;
+      transform: translate(0px, 0px);
+      animation: smith-torso-motion var(--cycle) infinite;
     }
-    @keyframes smith-strike {
-      0%, 100% { transform: rotate(-59deg); animation-timing-function: ease-in-out; }
-      24% { transform: rotate(-81deg); animation-timing-function: ease-out; }
-      36% { transform: rotate(-93deg); animation-timing-function: ease-in; }
-      48% { transform: rotate(0deg); animation-timing-function: ease-out; }
-      54% { transform: rotate(-10deg); animation-timing-function: ease-in-out; }
-      62% { transform: rotate(-7deg); animation-timing-function: ease-in-out; }
-      87% { transform: rotate(-59deg); }
-    }
-    @keyframes smith-brace {
-      0%, 87%, 100% { transform: translate(0,0); }
-      32%, 36% { transform: translate(-2px,-2px); }
-      48% { transform: translate(3px,3px); }
-      60% { transform: translate(2px,1px); }
+    @keyframes smith-torso-motion {
+      0% { transform: translate(0px, 0px); animation-timing-function: ease-in-out; }
+      24% { transform: translate(-1px, -1px); animation-timing-function: ease-out; }
+      35% { transform: translate(-2px, -2px); animation-timing-function: ease-in; }
+      41% { transform: translate(0px, -1px); animation-timing-function: linear; }
+      45% { transform: translate(2px, 1px); animation-timing-function: ease-in; }
+      48% { transform: translate(3px, 3px); animation-timing-function: ease-out; }
+      53% { transform: translate(3px, 2px); animation-timing-function: ease-in-out; }
+      60% { transform: translate(2px, 2px); animation-timing-function: ease-in-out; }
+      73% { transform: translate(1px, 1px); animation-timing-function: ease-in-out; }
+      90%, 100% { transform: translate(0px, 0px); }
     }
 
     @media (prefers-reduced-motion: reduce) {
       .fire, .fire-light, .rain, .strike-glow, .spark, .rune, .workpiece,
-      #smith-swing, #smith-torso { animation: none; }
+      .signature-glint, .signature-line, #smith-upper-arm, #smith-forearm,
+      #smith-wrist, #smith-torso { animation: none; }
     }
   </style>
 
   <g clip-path="url(#frame)">
-    <path d="M0 0h820v270H0z" fill="#171822"/>
-    <path d="M0 0h820v224H0z" fill="url(#room)"/>
-    <path d="M0 28h820v193H0z" fill="url(#masonry)"/>
+    <path d="M0 0h820v286H0z" fill="#171822"/>
+    <path d="M0 0h820v236H0z" fill="url(#room)"/>
+    <path d="M0 28h820v205H0z" fill="url(#masonry)"/>
     <path d="M0 0h820v23H0z" fill="#10141f"/>
     <path d="M0 20h820v3H0z" fill="#333243"/>
-    <path d="M44 23h9v198h-9zm724 0h9v198h-9z" fill="#181b26"/>
-    <path d="M53 23h3v198h-3zm724 0h3v198h-3z" fill="#51404b" opacity=".6"/>
+    <path d="M30 23h8v213h-8zm764 0h8v213h-8z" fill="#181b26"/>
+    <path d="M38 23h3v213h-3zm764 0h3v213h-3z" fill="#51404b" opacity=".6"/>
 
     <!-- Workshop window -->
-    <path d="M592 53h169v111H592z" fill="#111823"/>
-    <path d="M595 55h163v109H595z" fill="#414253"/>
-    <path d="M600 61h153v96H600z" fill="#101729"/>
-    <g clip-path="url(#window)" shape-rendering="crispEdges">
-      <path d="M601 62h151v94H601z" fill="url(#night)"/>
-      <path d="M706 72h13v4h5v13h-5v5h-13v-5h-5V76h5z" fill="#8dbbc9"/>
-      <path d="M704 77h5v4h-5zm12 7h5v4h-5z" fill="#6398aa"/>
-      <path d="M601 124h16v-8h19v-9h11v9h13v11h23v-13h11v-9h6v9h11v13h13v-10h28v39H601z" fill="#233345"/>
-      <path d="M601 139h17v-9h16v-7h11v7h17v14h15v-10h14v-8h17v8h17v10h27v12H601z" fill="#131d30"/>
-      <path d="M625 139h3v3h-3zm11-1h3v3h-3zm58 1h3v3h-3zm38 6h3v3h-3z" fill="#d0b67c" opacity=".74"/>
-      <g stroke="#82a7c0" stroke-width="1.5" opacity=".36">
-        <path class="rain" d="m613 63-4 6m65-18-4 6m-16 25-4 6m76 0-4 6m-95 9-4 6m123 10-4 6m-58-47-4 6m25 25-4 6"/>
-        <path class="rain shift" d="m632 47-4 6m110 2-4 6m-25-1-4 6m-65 42-4 6m70-12-4 6m-99-19-4 6m145 9-4 6"/>
+    <g transform="translate(32 12)">
+      <path d="M592 53h169v111H592z" fill="#111823"/>
+      <path d="M595 55h163v109H595z" fill="#414253"/>
+      <path d="M600 61h153v96H600z" fill="#101729"/>
+      <g clip-path="url(#window)" shape-rendering="crispEdges">
+        <path d="M601 62h151v94H601z" fill="url(#night)"/>
+        <path d="M706 72h13v4h5v13h-5v5h-13v-5h-5V76h5z" fill="#8dbbc9"/>
+        <path d="M704 77h5v4h-5zm12 7h5v4h-5z" fill="#6398aa"/>
+        <path d="M601 124h16v-8h19v-9h11v9h13v11h23v-13h11v-9h6v9h11v13h13v-10h28v39H601z" fill="#233345"/>
+        <path d="M601 139h17v-9h16v-7h11v7h17v14h15v-10h14v-8h17v8h17v10h27v12H601z" fill="#131d30"/>
+        <path d="M625 139h3v3h-3zm11-1h3v3h-3zm58 1h3v3h-3zm38 6h3v3h-3z" fill="#d0b67c" opacity=".74"/>
+        <g stroke="#82a7c0" stroke-width="1.5" opacity=".36">
+          <path class="rain" d="m613 63-4 6m65-18-4 6m-16 25-4 6m76 0-4 6m-95 9-4 6m123 10-4 6m-58-47-4 6m25 25-4 6"/>
+          <path class="rain shift" d="m632 47-4 6m110 2-4 6m-25-1-4 6m-65 42-4 6m70-12-4 6m-99-19-4 6m145 9-4 6"/>
+        </g>
       </g>
+      <path d="M674 59h4v101h-4zM598 108h156v4H598z" fill="#414657"/>
+      <path d="M589 160h174v6H589z" fill="#53505c"/>
+      <path d="M589 166h174v4H589z" fill="#151723"/>
     </g>
-    <path d="M674 59h4v101h-4zM598 108h156v4H598z" fill="#414657"/>
-    <path d="M589 160h174v6H589z" fill="#53505c"/>
-    <path d="M589 166h174v4H589z" fill="#151723"/>
 
     <!-- Chimney and furnace -->
-    <g shape-rendering="crispEdges">
-      <path d="M131 0h60v100h-60z" fill="#151822"/>
-      <path d="M136 0h48v101h-48z" fill="#34313e"/>
-      <path d="M136 0h9v101h-9z" fill="#4e3b45"/>
-      <path d="M176 0h8v101h-8z" fill="#242632"/>
-      <path d="M133 33h54v6h-54zm0 29h54v6h-54z" fill="#644749"/>
-      <path d="M106 200v-41h7v-24h12v-14h16v-11h51v11h16v14h12v24h7v41z" fill="#171820"/>
-      <path d="M111 190v-31h8v-23h12v-12h16v-9h39v9h17v12h11v23h8v31z" fill="#755051"/>
-      <path d="M111 185v-11h8v-17h8v-18h12v-10h15v-7h27v7h15v10h12v18h7v17h7v11z" fill="#a46752"/>
-      <path d="M126 182v-22h8v-15h12v-9h13v-6h18v6h12v9h12v15h8v22z" fill="#563432"/>
-    </g>
-    <ellipse class="fire-light" cx="168" cy="169" rx="155" ry="111" fill="url(#forge-glow)"/>
-    <g shape-rendering="crispEdges">
-      <path d="M135 182v-25h9v-13h13v-7h25v7h11v13h8v25z" fill="#2c1e27"/>
-      <path d="M135 182h66v-10h-9v-5h-14v2h-25v-3h-11v6h-7z" fill="#6e3334"/>
-      <path class="fire" d="M143 178v-13h5v-10h5v8h6v-7h5v-14h6v7h5v10h6v-7h6v9h6v17z" fill="#d65b42"/>
-      <path class="fire shift" d="M152 178v-8h6v-6h5v7h5v-14h5v7h6v7h8v7z" fill="#ffa454"/>
-      <path d="M161 178v-5h7v-4h6v4h7v5z" fill="#ffe4a0"/>
-      <path d="M107 184h120v8H107z" fill="#bc7e60"/>
-      <path d="M103 192h128v8H103z" fill="#523840"/>
-      <path d="M114 200h106v21H114z" fill="#332a34"/>
-      <path d="M105 218h125v6H105z" fill="#573c42"/>
-      <path d="M120 204h19v4h-19zm80 7h13v4h-13z" fill="#76504b"/>
+    <g transform="translate(275 91) scale(.65)">
+      <g shape-rendering="crispEdges">
+        <path d="M131 0h60v100h-60z" fill="#151822"/>
+        <path d="M136 0h48v101h-48z" fill="#34313e"/>
+        <path d="M136 0h9v101h-9z" fill="#4e3b45"/>
+        <path d="M176 0h8v101h-8z" fill="#242632"/>
+        <path d="M133 33h54v6h-54zm0 29h54v6h-54z" fill="#644749"/>
+        <path d="M106 200v-41h7v-24h12v-14h16v-11h51v11h16v14h12v24h7v41z" fill="#171820"/>
+        <path d="M111 190v-31h8v-23h12v-12h16v-9h39v9h17v12h11v23h8v31z" fill="#755051"/>
+        <path d="M111 185v-11h8v-17h8v-18h12v-10h15v-7h27v7h15v10h12v18h7v17h7v11z" fill="#a46752"/>
+        <path d="M126 182v-22h8v-15h12v-9h13v-6h18v6h12v9h12v15h8v22z" fill="#563432"/>
+      </g>
+      <ellipse class="fire-light" cx="168" cy="169" rx="155" ry="111" fill="url(#forge-glow)"/>
+      <g shape-rendering="crispEdges">
+        <path d="M135 182v-25h9v-13h13v-7h25v7h11v13h8v25z" fill="#2c1e27"/>
+        <path d="M135 182h66v-10h-9v-5h-14v2h-25v-3h-11v6h-7z" fill="#6e3334"/>
+        <path class="fire" d="M143 178v-13h5v-10h5v8h6v-7h5v-14h6v7h5v10h6v-7h6v9h6v17z" fill="#d65b42"/>
+        <path class="fire shift" d="M152 178v-8h6v-6h5v7h5v-14h5v7h6v7h8v7z" fill="#ffa454"/>
+        <path d="M161 178v-5h7v-4h6v4h7v5z" fill="#ffe4a0"/>
+        <path d="M107 184h120v8H107z" fill="#bc7e60"/>
+        <path d="M103 192h128v8H103z" fill="#523840"/>
+        <path d="M114 200h106v21H114z" fill="#332a34"/>
+        <path d="M105 218h125v6H105z" fill="#573c42"/>
+        <path d="M120 204h19v4h-19zm80 7h13v4h-13z" fill="#76504b"/>
+      </g>
     </g>
 
-    <!-- Tool rack and workbench -->
-    <g shape-rendering="crispEdges">
+    <!-- Tool rack -->
+    <g transform="translate(154 -30)" shape-rendering="crispEdges">
       <path d="M245 72h91v58h-91z" fill="#181b25"/>
       <path d="M248 74h85v53h-85z" fill="#423640"/>
       <path d="M248 74h85v3h-85z" fill="#6e514e"/>
@@ -182,6 +268,9 @@
       <path d="M283 83h4v7h6v-7h4v9h-4v24h-6V92h-4z" fill="#7e8797"/>
       <path d="M311 85h10v16h-4v14h-5v-15h-4v-6h3z" fill="#b07857"/>
 
+    </g>
+    <!-- Workbench -->
+    <g transform="translate(31 12)" shape-rendering="crispEdges">
       <path d="M620 187h123v36H620z" fill="#181b27"/>
       <path d="M624 193h9v30h-9zm105 0h9v30h-9z" fill="#403442"/>
       <path d="M636 210h91v5h-91z" fill="#2c2935"/>
@@ -194,113 +283,150 @@
       <path d="M632 202h6v4h-6zm92 0h6v4h-6z" fill="#7d5b60"/>
     </g>
 
-    <!-- Floor and anvil -->
-    <path d="M0 223h820v47H0z" fill="#23212c"/>
-    <path d="M0 223h820v3H0z" fill="#584251"/>
-    <path d="M0 226h820v44H0z" fill="url(#floorboards)"/>
-    <ellipse cx="179" cy="226" rx="204" ry="41" fill="url(#ground-glow)"/>
-    <path d="M358 229h202v7H358zM99 228h132v4H99z" fill="#131722" opacity=".76"/>
-    <g shape-rendering="crispEdges">
-      <path d="M477 216h73v12h-73z" fill="#131722"/>
-      <path d="M481 207h64v19h-64z" fill="#795042"/>
-      <path d="M481 205h64v4h-64z" fill="#b07152"/>
-      <path d="M488 210h4v16h-4zm35 3h3v12h-3zm12-5h3v18h-3z" fill="#4f3436"/>
-      <path d="M463 166h101v8h-6v5h-12v5h-17v16h8v6h-46v-6h9v-15h-15v-5h-11v-4h-11z" fill="#101722"/>
-      <path d="M466 166h94v7h-11v5h-22v20h7v4h-39v-4h8v-19h-16v-5h-13v-3h-8z" fill="#46566b"/>
-      <path d="M466 166h94v4h-94z" fill="#9ba9b9"/>
-      <path d="M486 175h41v4h-41zm18 6h6v15h-6z" fill="#6a798c"/>
-      <path d="M497 200h34v3h-34z" fill="#283140"/>
-      <path class="workpiece" d="M484 162h24v4h-24z" fill="#73d6ca"/>
-      <path d="M489 161h14v2h-14z" fill="#d9fff0"/>
+    <!-- Profile and floor -->
+    <path d="M0 23h420v212H0z" fill="url(#wall-shade)"/>
+    <g aria-hidden="true">
+      <g transform="translate(67 62)" color="#a2ebcf">
+        <use href="#code-mark" stroke="currentColor" stroke-width="2.2"/>
+      </g>
+      <use href="#profile-name" fill="#f4f1ec"/>
+      <g clip-path="url(#name-silhouette)">
+        <rect class="signature-glint" x="322" y="74" width="81" height="67" fill="url(#letter-glint)"/>
+      </g>
+      <text x="51" y="165" fill="#bfc8d3" font-family="system-ui, -apple-system, sans-serif"
+            font-size="22" textLength="288" lengthAdjust="spacingAndGlyphs">Ciência da Computação · UFPel</text>
+      <path d="M337 196H51" fill="none" stroke="#58645e" stroke-width="2"/>
+      <path class="signature-line" d="M337 196H51" pathLength="189"
+            fill="none" stroke="#9bf7d3" stroke-width="2.5"/>
+      <path d="M49 194h5v5h-5zm286 0h5v5h-5z" fill="#83b6a2"/>
     </g>
+    <path d="M0 235h820v51H0z" fill="#23212c"/>
+    <path d="M0 235h820v3H0z" fill="#584251"/>
+    <path d="M0 238h820v48H0z" fill="url(#floorboards)"/>
+    <ellipse cx="386" cy="237" rx="175" ry="40" fill="url(#ground-glow)"/>
+    <path d="M436 241h202v7H436zM340 241h84v4h-84z" fill="#131722" opacity=".76"/>
 
-    <g id="forge-worker" shape-rendering="crispEdges" stroke-linejoin="round">
-      <!-- Far boot, near boot and their folded cuffs. -->
-      <path fill="#121821" d="M365 177h45v8h12v24h8v6h8v10h-33v-6h-4v-22h-15v10h-5v18h-35v-10h6v-16h6v-16h7z"/>
-      <path fill="#343e50" d="M367 182h38v6h11v20h-11v-15h-22v12h-7v8h-17v-13h5v-12h3z"/>
-      <path fill="#546274" d="M361 201h17v5h-17zm45-5h9v6h-9z"/>
-      <path fill="#925232" d="M355 211h21v9h-25v-4h4zm53-1h13v5h9v5h-22z"/>
-      <path fill="#da9254" d="M352 216h10v4h-10zm70 0h9v4h-9z"/>
-      <g id="smith-torso">
-        <!-- Canvas shirt, rolled sleeve, and asymmetric leather apron. -->
-        <path fill="#121821" d="M368 127h29v5h14v7h7v22h-5v14h4v13h-9v6h-49v-6h-7v-17h-6v-27h6v-10h16z"/>
-        <path fill="#343e50" d="M366 134h31v5h11v10h-6v12h-10v20h-31v-11h-9v-24h5v-8h9z"/>
-        <path fill="#586c78" d="M361 138h14v7h-12v12h-9v-9h4v-7h3z"/>
-        <path fill="#58bdb7" d="M373 131h8v5h13v6h-17v-5h-4z"/>
-        <path fill="#754130" d="M371 140h7v10h17v-11h7v12h5v12h-4v12h6v12h-8v3h-39v-6h-4v-11h6v-19h7z"/>
-        <path fill="#ad633b" d="M371 157h28v12h-5v9h-25v6h-7v-9h6v-12h3z"/>
-        <path fill="#db9559" d="M371 153h6v6h-6zm23 0h6v6h-6z"/>
-        <path fill="#623d36" d="M362 169h38v6h-38z"/>
-        <path fill="#efbd73" d="M377 168h10v8h-10z"/>
-        <path fill="#343e50" d="M380 170h5v3h-5z"/>
-        <!-- Rear arm rests against the belt. -->
-        <path fill="#121821" d="M350 145h12v5h6v12h6v6h-5v7h-15v-5h-7v-10h-4v-10h7z"/>
-        <path fill="#445662" d="M349 149h12v6h4v5h-16z"/>
-        <path fill="#78c7bb" d="M349 158h15v5h-15z"/>
-        <path fill="#cf8159" d="M353 163h12v3h5v4h-13v-3h-4z"/>
-        <!-- Hair, ear, cap, nose, and beard form a single readable profile. -->
-        <g id="smith-head">
-          <path fill="#121821" d="M363 84h26v4h11v6h10v7h7v8h-5v8h6v7h-7v8h-7v7h-26v-5h-10v-8h-9v-13h-6V97h5v-8h5z"/>
-          <path fill="#744731" d="M359 102h31v15h-8v12h-12v-9h-7v-10h-4z"/>
-          <path fill="#d58459" d="M378 105h28v11h7v6h-10v9h-20v-8h-8v-10h3z"/>
-          <path fill="#ffbf91" d="M385 105h21v10h5v6h-13v5h-12v-7h-5v-9h4z"/>
-          <path fill="#121821" d="M399 109h5v5h-5z"/>
-          <path fill="#633b32" d="M378 117h7v6h11v-4h7v5h6v5h-7v6h-22v-5h-6v-10h4z"/>
-          <path fill="#a36040" d="M385 127h14v4h-14z"/>
-          <path fill="#ffc596" d="M370 111h8v10h-5v-4h-3z"/>
-          <path fill="#965132" d="M358 98h5v-8h7v-4h17v4h11v6h5v6h-45z"/>
-          <path fill="#db9150" d="M366 94h5v-5h15v5h-9v5h-11z"/>
-          <path fill="#40515c" d="M358 102h33v5h-33z"/>
-          <path fill="#77c7bc" d="M363 101h14v4h-14z"/>
-          <path fill="#ba7246" d="M391 98h15v4h9v4h-24z"/>
+    <!-- Anvil and worker -->
+    <g transform="translate(78 12)">
+      <g shape-rendering="crispEdges">
+        <path d="M477 216h73v12h-73z" fill="#131722"/>
+        <path d="M481 207h64v19h-64z" fill="#795042"/>
+        <path d="M481 205h64v4h-64z" fill="#b07152"/>
+        <path d="M488 210h4v16h-4zm35 3h3v12h-3zm12-5h3v18h-3z" fill="#4f3436"/>
+        <path d="M463 166h101v8h-6v5h-12v5h-17v16h8v6h-46v-6h9v-15h-15v-5h-11v-4h-11z" fill="#101722"/>
+        <path d="M466 166h94v7h-11v5h-22v20h7v4h-39v-4h8v-19h-16v-5h-13v-3h-8z" fill="#46566b"/>
+        <path d="M466 166h94v4h-94z" fill="#9ba9b9"/>
+        <path d="M486 175h41v4h-41zm18 6h6v15h-6z" fill="#6a798c"/>
+        <path d="M497 200h34v3h-34z" fill="#283140"/>
+        <path class="workpiece" d="M484 162h24v4h-24z" fill="#73d6ca"/>
+        <path d="M489 161h14v2h-14z" fill="#d9fff0"/>
+      </g>
+
+      <g id="forge-worker" shape-rendering="crispEdges" stroke-linejoin="round">
+        <!-- Far boot, near boot and their folded cuffs. -->
+        <path fill="#121821" d="M365 177h45v8h12v24h8v6h8v10h-33v-6h-4v-22h-15v10h-5v18h-35v-10h6v-16h6v-16h7z"/>
+        <path fill="#343e50" d="M367 182h38v6h11v20h-11v-15h-22v12h-7v8h-17v-13h5v-12h3z"/>
+        <path fill="#546274" d="M361 201h17v5h-17zm45-5h9v6h-9z"/>
+        <path fill="#925232" d="M355 211h21v9h-25v-4h4zm53-1h13v5h9v5h-22z"/>
+        <path fill="#da9254" d="M352 216h10v4h-10zm70 0h9v4h-9z"/>
+        <g id="smith-torso">
+          <!-- Canvas shirt, rolled sleeve, and asymmetric leather apron. -->
+          <path fill="#121821" d="M368 127h29v5h14v7h7v22h-5v14h4v13h-9v6h-49v-6h-7v-17h-6v-27h6v-10h16z"/>
+          <path fill="#343e50" d="M366 134h31v5h11v10h-6v12h-10v20h-31v-11h-9v-24h5v-8h9z"/>
+          <path fill="#586c78" d="M361 138h14v7h-12v12h-9v-9h4v-7h3z"/>
+          <path fill="#58bdb7" d="M373 131h8v5h13v6h-17v-5h-4z"/>
+          <path fill="#754130" d="M371 140h7v10h17v-11h7v12h5v12h-4v12h6v12h-8v3h-39v-6h-4v-11h6v-19h7z"/>
+          <path fill="#ad633b" d="M371 157h28v12h-5v9h-25v6h-7v-9h6v-12h3z"/>
+          <path fill="#db9559" d="M371 153h6v6h-6zm23 0h6v6h-6z"/>
+          <path fill="#623d36" d="M362 169h38v6h-38z"/>
+          <path fill="#efbd73" d="M377 168h10v8h-10z"/>
+          <path fill="#343e50" d="M380 170h5v3h-5z"/>
+          <!-- Rear arm rests against the belt. -->
+          <path fill="#121821" d="M350 145h12v5h6v12h6v6h-5v7h-15v-5h-7v-10h-4v-10h7z"/>
+          <path fill="#445662" d="M349 149h12v6h4v5h-16z"/>
+          <path fill="#78c7bb" d="M349 158h15v5h-15z"/>
+          <path fill="#cf8159" d="M353 163h12v3h5v4h-13v-3h-4z"/>
+          <!-- Hair, ear, cap, nose, and beard form a single readable profile. -->
+          <g id="smith-head">
+            <path fill="#121821" d="M363 84h26v4h11v6h10v7h7v8h-5v8h6v7h-7v8h-7v7h-26v-5h-10v-8h-9v-13h-6V97h5v-8h5z"/>
+            <path fill="#744731" d="M359 102h31v15h-8v12h-12v-9h-7v-10h-4z"/>
+            <path fill="#d58459" d="M378 105h28v11h7v6h-10v9h-20v-8h-8v-10h3z"/>
+            <path fill="#ffbf91" d="M385 105h21v10h5v6h-13v5h-12v-7h-5v-9h4z"/>
+            <path fill="#121821" d="M399 109h5v5h-5z"/>
+            <path fill="#633b32" d="M378 117h7v6h11v-4h7v5h6v5h-7v6h-22v-5h-6v-10h4z"/>
+            <path fill="#a36040" d="M385 127h14v4h-14z"/>
+            <path fill="#ffc596" d="M370 111h8v10h-5v-4h-3z"/>
+            <path fill="#965132" d="M358 98h5v-8h7v-4h17v4h11v6h5v6h-45z"/>
+            <path fill="#db9150" d="M366 94h5v-5h15v5h-9v5h-11z"/>
+            <path fill="#40515c" d="M358 102h33v5h-33z"/>
+            <path fill="#77c7bc" d="M363 101h14v4h-14z"/>
+            <path fill="#ba7246" d="M391 98h15v4h9v4h-24z"/>
+          </g>
+
+          <!-- Shoulder, elbow and wrist share anatomical pivots with their child segments. -->
+          <g transform="translate(399 144)">
+            <g id="smith-upper-arm">
+              <!-- The broad sleeve tapers toward a rolled cuff at the elbow. -->
+              <path fill="#121821" d="M-9-5h4v-4H7v2h10v2h10v3h4v10h-6v3H12v-2H2v-2h-8V5h-3z"/>
+              <path fill="#405460" d="M-5-4h4v-2h8v2h10v2h7v7h-5v2h-9V5H0V3h-5z"/>
+              <path fill="#607681" d="M-3-4h7v1h8v3H1v2h-4z"/>
+              <g transform="translate(27 0)">
+                <g id="smith-forearm">
+                  <path fill="#121821" d="M-6-4h3v-3h10v1h9v2h10v2h4v7h-5v2H13v1H2V6h-5V4h-3z"/>
+                  <path fill="#ce825d" d="M-3-3h9v-1h8v2h10v2h3v3H15v2H3V3h-6z"/>
+                  <path fill="#f4ad7d" d="M4-3h9v2h9v2h-9v1H4z"/>
+
+                  <g transform="translate(25 0)">
+                    <g id="smith-wrist">
+                      <path fill="#121821" d="M-10-3h46v-1h11v8H-8v-1h-2z"/>
+                      <path fill="#a66640" d="M-8-1h50v3H-8z"/>
+                      <path fill="#e3a56a" d="M8-1h30v2H8z"/>
+                      <!-- Flattened striking face and a narrower peen above the haft. -->
+                      <path fill="#121821" d="M41-14h9v3h3v8h-2v7h4v9H37V4h3v-7h-2v-8h3z"/>
+                      <path fill="#526778" d="M42-11h7v3h2v4h-3v8h-6v-8h-2v-4h2z"/>
+                      <path fill="#90a4aa" d="M42-11h7v3h-8v-2h1zm-3 16h13v5H39z"/>
+                      <path fill="#c2d2c9" d="M39 9h13v2H39z"/>
+                      <!-- Knuckles overlap the haft; the little finger closes under it. -->
+                      <path fill="#121821" d="M-8-3h3v-5h8v2h4v3h2v7H5v4h-9V6h-4z"/>
+                      <path fill="#d88c62" d="M-6-2h3v-4h5v2h3v3h2v3H3v4h-6V4h-3z"/>
+                      <path fill="#ffbf91" d="M-3-5h5v2h3v3H0v-2h-3z"/>
+                    </g>
+                  </g>
+                </g>
+              </g>
+              <path fill="#263542" d="M20-6h7v2h3v10h-4v2h-7V5h-1v-9h2z"/>
+              <path fill="#63bcb4" d="M21-4h6v2h1v6h-3v2h-5V3h1z"/>
+              <path fill="#a2d4c6" d="M21-4h5v3h-5z"/>
+            </g>
+          </g>
         </g>
       </g>
-      <!-- Local hammer construction uses a shared shoulder pivot at 417,135. -->
-      <g transform="translate(417 135)">
-        <g id="smith-swing">
-          <path fill="#121821" d="M-12 -5h12v5h12v6h13v-2h11v3h5v12h-7v6H19v-4H7v-4H-5v-5h-9V-1h2z"/>
-          <path fill="#405461" d="M-9 -2h8v5h11v6h5v5H4v-4H-8z"/>
-          <path fill="#74cec1" d="M8 6h7v3h5v5h-7v-3H8z"/>
-          <path fill="#d78458" d="M16 12h10v-3h10v8h-7v4H20v-4h-4z"/>
-          <path fill="#ffbf91" d="M16 11h12v-4h6v6h-7v3h-9z"/>
-          <!-- The handle passes through the closed glove and the steel head. -->
-          <path fill="#121821" d="M23 3l4-9 55 22-4 10z"/>
-          <path fill="#b66c42" d="M27 1l2-4 50 20-2 5z"/>
-          <path fill="#efac69" d="M38 3l2-2 34 14-2 2z"/>
-          <path fill="#121821" d="M27 0h8v3h6v8h-4v4h-8v-4h-5V4h3z"/>
-          <path fill="#d88657" d="M28 2h6v3h5v5h-5v3h-4v-4h-3V5h1z"/>
-          <path fill="#ffd0a5" d="M29 2h5v3h4v3h-6V5h-3z"/>
-          <path fill="#121821" d="M76 -1h10v3h7v8h-3v7h-4v8h-3v3H73v-3h-8v-8h3v-6h4V4h4z"/>
-          <path fill="#4f6373" d="M77 3h8v3h5v4h-4v7h-4v7h-8v-3h-6v-4h4v-6h3V6h2z"/>
-          <path fill="#869aa3" d="M77 3h8v3h4v3h-8v-3h-6V5h2z"/>
-          <path fill="#bdd1cc" d="M69 18h7v3h7v3h-9v-3h-5z"/>
+
+      <ellipse class="strike-glow" cx="496" cy="162" rx="109" ry="78" fill="url(#strike-glow)"/>
+      <g shape-rendering="crispEdges">
+        <path class="spark" d="M493 160h4v4h-4z" fill="#f6fff2"
+              style="--near-x: 8px; --near-y: -15px; --dx: 29px; --dy: -58px; --end-x: 34px; --end-y: -53px"/>
+        <path class="spark" d="M494 160h4v3h-4z" fill="#fcd391"
+              style="--near-x: 19px; --near-y: -8px; --dx: 74px; --dy: -33px; --end-x: 86px; --end-y: -21px"/>
+        <path class="spark" d="M494 159h3v4h-3z" fill="#aaffdb"
+              style="--near-x: 13px; --near-y: -14px; --dx: 51px; --dy: -69px; --end-x: 61px; --end-y: -62px"/>
+        <path class="spark" d="M494 161h3v3h-3z" fill="#ed9c6c"
+              style="--near-x: 17px; --near-y: -3px; --dx: 83px; --dy: -7px; --end-x: 96px; --end-y: 13px"/>
+        <path class="spark" d="M495 161h3v4h-3z" fill="#ffe6ac"
+              style="--near-x: -3px; --near-y: -15px; --dx: -14px; --dy: -50px; --end-x: -19px; --end-y: -45px"/>
+        <path class="spark" d="M494 161h3v3h-3z" fill="#ffd49a"
+              style="--near-x: -3px; --near-y: -11px; --dx: -24px; --dy: -56px; --end-x: -35px; --end-y: -46px"/>
+        <path class="spark" d="M494 161h3v3h-3z" fill="#f6fff2"
+              style="--near-x: 12px; --near-y: -3px; --dx: 49px; --dy: -10px; --end-x: 56px; --end-y: 9px"/>
+      </g>
+      <g transform="translate(506 157)">
+        <g class="rune">
+          <use href="#code-mark" stroke="#80f6c9" stroke-width="6" opacity=".3"/>
+          <use href="#code-mark" stroke="#c2ffe3" stroke-width="2.5"/>
         </g>
       </g>
     </g>
 
-    <ellipse class="strike-glow" cx="496" cy="162" rx="109" ry="78" fill="url(#strike-glow)"/>
-    <g shape-rendering="crispEdges">
-      <path class="spark" d="M493 160h4v4h-4z" fill="#f6fff2"
-            style="--near-x: 8px; --near-y: -15px; --dx: 29px; --dy: -58px; --end-x: 34px; --end-y: -53px"/>
-      <path class="spark" d="M494 160h4v3h-4z" fill="#fcd391"
-            style="--near-x: 19px; --near-y: -8px; --dx: 74px; --dy: -33px; --end-x: 86px; --end-y: -21px"/>
-      <path class="spark" d="M494 159h3v4h-3z" fill="#aaffdb"
-            style="--near-x: 13px; --near-y: -14px; --dx: 51px; --dy: -69px; --end-x: 61px; --end-y: -62px"/>
-      <path class="spark" d="M494 161h3v3h-3z" fill="#ed9c6c"
-            style="--near-x: 17px; --near-y: -3px; --dx: 83px; --dy: -7px; --end-x: 96px; --end-y: 13px"/>
-      <path class="spark" d="M495 161h3v4h-3z" fill="#ffe6ac"
-            style="--near-x: -3px; --near-y: -15px; --dx: -14px; --dy: -50px; --end-x: -19px; --end-y: -45px"/>
-      <path class="spark" d="M494 161h3v3h-3z" fill="#ffd49a"
-            style="--near-x: -3px; --near-y: -11px; --dx: -24px; --dy: -56px; --end-x: -35px; --end-y: -46px"/>
-      <path class="spark" d="M494 161h3v3h-3z" fill="#f6fff2"
-            style="--near-x: 12px; --near-y: -3px; --dx: 49px; --dy: -10px; --end-x: 56px; --end-y: 9px"/>
-    </g>
-    <g transform="translate(506 157)">
-      <g class="rune">
-        <use href="#code-mark" stroke="#80f6c9" stroke-width="6" opacity=".3"/>
-        <use href="#code-mark" stroke="#c2ffe3" stroke-width="2.5"/>
-      </g>
-    </g>
   </g>
-  <rect x="1" y="1" width="818" height="268" rx="16" fill="none" stroke="#4b4051" stroke-width="2"/>
+  <rect x="1" y="1" width="818" height="284" rx="16" fill="none" stroke="#4b4051" stroke-width="2"/>
 </svg>

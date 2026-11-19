@@ -1,17 +1,5 @@
-<picture>
-  <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset="assets/neofetch-mobile-dark.svg" />
-  <source media="(max-width: 600px)" srcset="assets/neofetch-mobile-light.svg" />
-  <source media="(prefers-color-scheme: dark)" srcset="assets/neofetch-dark.svg" />
-  <img src="assets/neofetch-light.svg" width="820" alt="luiz@felipe — terminal em que o comando neofetch é digitado e a saída aparece linha a linha: Ciência da Computação na UFPel, iniciação científica em modelagem matemática, C, C++, Python e LaTeX, análise real, projetos atlas-pdf e modelagem, e problemas resolvidos no Codeforces." />
-</picture>
+![Luiz Felipe · Ciência da Computação na UFPel. Em uma oficina em pixel art, um ferreiro martela uma peça e uma onda de luz percorre o nome.](assets/oficina-de-codigo.svg)
 
-<samp>Entre a análise matemática e o funcionamento dos computadores.</samp>
+Faço iniciação científica em **modelagem matemática** e gosto de entender como os computadores funcionam.
 
-<samp>
-<a href="https://www.linkedin.com/in/luiz-felipe-pereira-bandeira-8a51761b6/">linkedin</a> ·
-<a href="https://codeforces.com/profile/root.svp">codeforces</a> ·
-<a href="https://github.com/luizfelipejs/atlas-pdf">atlas-pdf</a> ·
-<a href="https://github.com/luizfelipejs/modelagem">modelagem</a>
-</samp>
-
-<img src="assets/oficina-de-codigo.svg" width="820" alt="Oficina em pixel art. Um ferreiro martela uma peça e levanta faíscas e um símbolo de código." />
+[LinkedIn](https://www.linkedin.com/in/luiz-felipe-pereira-bandeira-8a51761b6/) · [Codeforces](https://codeforces.com/profile/root.svp) · [Atlas PDF](https://github.com/luizfelipejs/atlas-pdf) · [Modelagem](https://github.com/luizfelipejs/modelagem)
