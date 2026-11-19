@@ -13,3 +13,5 @@
 <a href="https://github.com/luizfelipejs/atlas-pdf">atlas-pdf</a> ·
 <a href="https://github.com/luizfelipejs/modelagem">modelagem</a>
 </samp>
+
+<img src="assets/cafe-em-orbita.svg" width="820" alt="Luiz Felipe — xícara de café com partículas em órbita." />
